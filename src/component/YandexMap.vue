@@ -1,19 +1,11 @@
 <template>
-    <div class="ymap-wrapper__custom">
+    <div 
+        class="ymap-wrapper__custom" 
+        style="width: 100%; height: 100%;max-height: 520px; position: relative; border: 1px solid transparent;border-radius: 17px;overflow: hidden;">
         <div :id="mapId" style="width: 100%; height: 100%; "></div>
     </div>
 </template>
-<style scoped>
-.ymap-wrapper__custom {
-    width: 100%; 
-    height: 100%;
-    max-height: 520px;
-    position: relative;
-    border: 1px solid transparent;
-    border-radius: 17px;
-    overflow: hidden;
-}
-</style>
+
 <script>
 import { YMapsCustom } from './YandexMap';
 
@@ -36,7 +28,8 @@ export default {
             type: Array,
             default: null
         },
-        currentCoords: []
+        currentCoords: [],
+        pathToBaloon: '',
     },
 
     data() {
@@ -83,7 +76,8 @@ export default {
                     zoom: 10,
                     minZoom: 10,
                     maxZoom: 19
-                }
+                },
+                pathToBaloon: this.pathToBaloon
             });
 
             const { map, map_objects, search_control, zoom_control } = await Map.faInitMap();

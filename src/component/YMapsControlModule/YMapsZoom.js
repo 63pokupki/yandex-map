@@ -63,9 +63,22 @@ export class YMapsZoom extends YMapsBase {
                 const map = this.getData().map;
 
                 // Снимаем обработчики.
-                document.querySelector('#zoom-in')?.removeEventListener('click', this.zoomInCb);
-                document.querySelector('#zoom-out')?.removeEventListener('click', this.zoomOutCb);
-                document.querySelector('.range')?.removeEventListener('click', this.zoomByRangeLineClickCb);
+                const zoomIn =  document.querySelector('#zoom-in');
+                const zoomOut = document.querySelector('#zoom-out');
+                const range = document.querySelector('.range');
+
+                if (zoomIn) {
+                    zoomIn.removeEventListener('click', this.zoomInCb);
+                }
+                
+                if (zoomOut) {
+                    zoomOut.removeEventListener('click', this.zoomOutCb);
+                }
+
+                if (range) {
+                    range.removeEventListener('click', this.zoomByRangeLineClickCb);
+                }
+
                 map.events.remove('wheel', this.setCustomZoomValueCb);
 
                 // Очищаем таймаут зума при скролле

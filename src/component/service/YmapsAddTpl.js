@@ -8,7 +8,7 @@ export function fAddTemplateToMap(Cls, ctx) {
 }
 
 /** Добавить на карту объекты */
-export function fAddBaloonToMap(Cls, ctx) {
+export function fAddBaloonToMap(Cls, pathToBaloon, ctx) {
 	const cls = new Cls(ctx.Map, ctx.markers);
-	return cls.fCreate();
+	return cls.fCreate(pathToBaloon);
 }

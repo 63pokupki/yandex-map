@@ -11,7 +11,7 @@ export class YMapsObjects {
     }
 
     /** Создаем объект контрола, с помощью templateLayoutFactory */
-    fCreate() {
+    fCreate(pathToBaloon) {
         this.Map.geoObjects.removeAll();
         this.objectManager = new ymaps.ObjectManager({
             // Чтобы метки начали кластеризоваться, выставляем опцию.
@@ -19,7 +19,7 @@ export class YMapsObjects {
             // Опции для кастомной иконки одиночной метки
             geoObjectIconLayout: 'default#image',
             // Своё изображение иконки метки.
-            geoObjectIconImageHref: require('@/assets/images/map-point.svg'),
+            geoObjectIconImageHref: pathToBaloon,
             // Размеры метки.
             geoObjectIconImageSize: [50, 50],
             // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
@@ -27,7 +27,7 @@ export class YMapsObjects {
             // Опции для кастомной иконки кластера
             clusterIconLayout: 'default#image',
             // Своё изображение иконки метки.
-            clusterIconImageHref: require('@/assets/images/map-point.svg'),
+            clusterIconImageHref: pathToBaloon,
             // Размеры метки.
             clusterIconImageSize: [70, 70],
             // Смещение левого верхнего угла иконки относительно

@@ -25,7 +25,10 @@ export class YMapsCustom {
     Map;
 
     /** Контроллеры карты */
-    MapControls = {};
+    MapControls;
+
+    /** Путь до изображения балуна */
+    pathToBaloon;
 
     constructor(MapConfig) {
         this.mapId = MapConfig.mapId;
@@ -33,6 +36,7 @@ export class YMapsCustom {
         this.controls = MapConfig.controls;
         this.markers = MapConfig.markers;
         this.zoomOptions = MapConfig.zoomOptions;
+        this.pathToBaloon = MapConfig.pathToBaloon;
     }
 
     /** Инициализация карты */
@@ -52,6 +56,8 @@ export class YMapsCustom {
         // Применим шаблон стилей
         fAddTemplateToMap(YMapsStyles, this);
 
+        this.MapControls = {};
+
         // Добавить кастомный инпут поиска
         this.MapControls.search_control = fAddTemplateToMap(YMapsSearch, this);
 
@@ -59,7 +65,7 @@ export class YMapsCustom {
         this.MapControls.zoom_control  = fAddTemplateToMap(YMapsZoom, this);
 
         // Добавим объекты на карту
-        this.MapControls.map_objects = fAddBaloonToMap(YMapsObjects, this);
+        this.MapControls.map_objects = fAddBaloonToMap(YMapsObjects, this.pathToBaloon, this);
 
         // Вернем созданные объекты для взаимодействия с Vue
         return {
