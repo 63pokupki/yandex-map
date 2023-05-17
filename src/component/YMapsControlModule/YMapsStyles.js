@@ -110,7 +110,8 @@ export class YMapsStyles extends YMapsBase {
             	.ymaps-2-1-79-gotoymaps__container,
 				.ymaps-2-1-79-float-button,
 				.ymaps-2-1-79-_hidden-icon,
-				.ymaps-2-1-79-gototaxi {
+				.ymaps-2-1-79-gototaxi,
+				.ymaps-2-1-79-searchbox__normal-layout {
             	    display: none;
             	}
 				@media screen and ( max-width: 550px) {
