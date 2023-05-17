@@ -107,7 +107,10 @@ export class YMapsStyles extends YMapsBase {
 				}
 				.ymaps-2-1-79-copyright__content,
             	.ymaps-2-1-79-gototech,
-            	.ymaps-2-1-79-gotoymaps__container {
+            	.ymaps-2-1-79-gotoymaps__container,
+				.ymaps-2-1-79-float-button,
+				.ymaps-2-1-79-_hidden-icon,
+				.ymaps-2-1-79-gototaxi {
             	    display: none;
             	}
 				@media screen and ( max-width: 550px) {

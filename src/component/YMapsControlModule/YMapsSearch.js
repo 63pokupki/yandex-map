@@ -16,6 +16,8 @@ export class YMapsSearch extends YMapsBase {
 			suggestionValue: null,
 			/** Объект карты, получаем из родительского модуля */
 			Map: this.Map,
+			/** Нужно ли ставить маркер при поиске в центр карты */
+			putMarkerInSearch: this.putMarkerInSearch,
 
 			build: function () {
 				SearchLayout.superclass.build.call(this);
@@ -79,6 +81,11 @@ export class YMapsSearch extends YMapsBase {
 				ymaps.geocode(value).then((result) => {
 					const coords = result.geoObjects.get(0).geometry.getCoordinates();
 					this.Map.setCenter([coords[0], coords[1]]);
+					if(this.putMarkerInSearch) {
+						this.Map.geoObjects.removeAll();
+						this.oneMarker = new ymaps.Placemark(coords);
+						this.Map.geoObjects.add( this.oneMarker);
+					}
 				}
 				);
 			},

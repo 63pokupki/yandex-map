@@ -28,6 +28,10 @@ export default {
             type: Array,
             default: null
         },
+        putMarkerInSearch: {
+            type: Boolean,
+            default: false
+        },
         currentCoords: [],
         pathToBaloon: '',
     },
@@ -77,7 +81,8 @@ export default {
                     minZoom: 10,
                     maxZoom: 19
                 },
-                pathToBaloon: this.pathToBaloon
+                pathToBaloon: this.pathToBaloon,
+                putMarkerInSearch: this.putMarkerInSearch,
             });
 
             const { map, map_objects, search_control, zoom_control } = await Map.faInitMap();
@@ -97,6 +102,9 @@ export default {
                 if(this.oneMarkerCoords) {
                     this.oneMarker = new ymaps.Placemark(this.oneMarkerCoords);
                     this.map.geoObjects.add(this.oneMarker);
+                }
+                if (this.putMarkerInSearch) {
+                    this.map.geoObjects.events.add('click', this.onClickOnceMarket);                    
                 }
                 this.map.controls.add(this.searchControl);
                 this.searchControl.events.add('resultselect', this.Search);
@@ -143,6 +151,13 @@ export default {
             this.oneMarker = new ymaps.Placemark(coords);
             this.map.geoObjects.add( this.oneMarker);
             this.$emit("ClickMap", coords);
+
+        },
+
+        /** Событие клика по маркеру при выборе города */
+        onClickOnceMarket(e) {
+            let coords = e.get('coords');
+            this.$emit("ClickOneMarker", coords);
         },
 
         // Событие выбора результата поиска
