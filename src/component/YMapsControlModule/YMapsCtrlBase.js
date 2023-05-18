@@ -1,9 +1,10 @@
 export class YMapsBase {
-	constructor(map) {
+	constructor(map, putMarkerInSearch) {
 		this.events = new ymaps.event.Manager();
 		this.options = new ymaps.option.Manager();
 		this.state = new ymaps.data.Manager();
 		this.Map = map;
+		this.putMarkerInSearch = putMarkerInSearch;
 	}
 
 	/** Устанвливаем родительский элемент для контрола созданного с помощью templateLayoutFactory */
