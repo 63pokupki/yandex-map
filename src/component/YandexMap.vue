@@ -16,6 +16,13 @@ export default {
             type: Array,
             default: null
         },
+        /**
+         * @type {Array.<{markers: {id:number, latitude:string, longitude: string}[], pathToBaloon: string}>
+         */
+        clusters: {
+            type: Array,
+            default: null``
+        },
         coordsCenter: {
             type: Array,
             default: null
