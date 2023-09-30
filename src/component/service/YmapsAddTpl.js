@@ -9,8 +9,13 @@ export function fAddTemplateToMap(Cls, ctx) {
 
 /** Добавить на карту объекты */
 export function fAddBaloonToMap(Cls, pathToBaloon, ctx) {
-	const cls = new Cls(ctx.Map, ctx.markers);
-	return cls.fCreate(pathToBaloon);
+	const cls = new Cls({
+		Map: ctx.Map, 
+		markers: ctx.markers,
+		pathToBaloon,
+		clusters: ctx.clusters,
+	});
+	return cls.fCreate();
 }
 
 /** Добавить контроллеры на карту (Поиск, Зум) и флаг добавления маркера при поиске*/

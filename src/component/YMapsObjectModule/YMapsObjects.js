@@ -1,19 +1,26 @@
 export class YMapsObjects {
     /** Карта */
     Map;
-
     /** Маркеры */
     markers;
+    /** Путь до изображения балуна */
+    pathToBaloon;
+    /** Кластеры, если нужны разные виды маркеров */
+    clusters;
 
-    constructor(map, markers) {
-        this.markers = markers;
-        this.Map = map;
+    /**
+     * @param {{Map: any, markers: Array, pathToBaloon: string, clusters: Array}} params
+     */
+    constructor(params) {
+        this.markers = params.markers;
+        this.clusters = params.clusters;
+        this.pathToBaloon = params.pathToBaloon
+        this.Map = params.Map;
     }
 
-    /** Создаем объект контрола, с помощью templateLayoutFactory */
-    fCreate(pathToBaloon) {
-        this.Map.geoObjects.removeAll();
-        this.objectManager = new ymaps.ObjectManager({
+    /** Создать маркеры для одного кластера */
+    fCreateMarkers(markers, pathToBaloon) {
+        const objectManager = new ymaps.ObjectManager({
             // Чтобы метки начали кластеризоваться, выставляем опцию.
             clusterize: true,
             // Опции для кастомной иконки одиночной метки
@@ -37,19 +44,37 @@ export class YMapsObjects {
 
         const objectColection = [];
 
-        for (let i = 0; i < this.markers.length; i++) {
+        for (let i = 0; i < markers.length; i++) {
             objectColection.push({
                 type: 'Feature',
-                id: this.markers[i].id,
+                id: markers[i].id,
                 geometry: {
                     type: 'Point',
-                    coordinates: [this.markers[i].latitude, this.markers[i].longitude]
+                    coordinates: [markers[i].latitude, markers[i].longitude]
                 },
             })
         }
+        objectManager.add(objectColection);
+        this.Map.geoObjects.add(objectManager);
+    }
 
-        this.objectManager.add(objectColection);
-        this.Map.geoObjects.add(this.objectManager);
+    /** Создать множество кластеров */
+    fCreateMultipleClusters(clusters) {
+        for (let i = 0; i<clusters.length; i++) {
+            this.fCreateMarkers(clusters.markers, clusters.pathToBaloon)
+        }
+    }
+
+    /** Создаем объект контрола, с помощью templateLayoutFactory */
+    fCreate() {
+        this.Map.geoObjects.removeAll();
+
+        let objectManager;
+        if (this.clusters && this.clusters.length) {
+            objectManager = this.fCreateMultipleClusters(this.clusters)
+        } else {
+            objectManager = this.fCreateMarkers(this.markers, this.pathToBaloon)
+        }
 
         return this.objectManager;
     }

@@ -8,25 +8,20 @@ import { YMapsZoom } from './YMapsControlModule/YMapsZoom';
 export class YMapsCustom {
     /** Id карты */
     mapId;
-
     /** Координаты центра */
     center;
-
     /** Элементы управления для отрисовки */
     controls;
-
     /** Маркеры на карте */
     markers;
-
+    /** Кластеры, если нужны разные виды маркеров */
+    clusters;
     /** Начальные опции зума */
     zoomOptions;
-
     /** Объект карты */
     Map;
-
     /** Контроллеры карты */
     MapControls;
-
     /** Путь до изображения балуна */
     pathToBaloon;
 
@@ -35,6 +30,7 @@ export class YMapsCustom {
         this.center = MapConfig.center;
         this.controls = MapConfig.controls;
         this.markers = MapConfig.markers;
+        this.clusters = MapConfig.clusters;
         this.zoomOptions = MapConfig.zoomOptions;
         this.pathToBaloon = MapConfig.pathToBaloon;
         this.putMarkerInSearch = MapConfig.putMarkerInSearch;

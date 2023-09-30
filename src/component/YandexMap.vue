@@ -17,11 +17,19 @@ export default {
             default: null
         },
         /**
-         * @type {Array.<{markers: {id:number, latitude:string, longitude: string}[], pathToBaloon: string}>
+         * список кластеров
+         * @type {Array.<{markers: {id:number, latitude:string, longitude: string}[], pathToBaloon: string}>} 
          */
         clusters: {
             type: Array,
-            default: null``
+            default: []
+        },
+        /**
+         * Ставить ли маркер по клику
+         */
+        isMarkerOnClick: {
+            type: Boolean,
+            default: false,
         },
         coordsCenter: {
             type: Array,
@@ -51,6 +59,8 @@ export default {
             point: null,
             oneMarker: null,
             searchControl: null,
+            searchManager: null,
+            zoomManager: null,
             mapId: `yandex-map-${Math.round(Math.random() * 1000)}`
         };
     },
@@ -83,6 +93,7 @@ export default {
                 center: this.coordsCenter,
                 controls: [],
                 markers: markers,
+                clusters: this.clusters,
                 zoomOptions: {
                     zoom: 10,
                     minZoom: 10,
@@ -96,8 +107,10 @@ export default {
 
             this.map = map;
             this.objectManager = map_objects;
+            this.searchManager = search_control
+            this.zoomManager = zoom_control
 
-            if(!this.markers){
+            if(!this.markers || this.isMarkerOnClick){
                 this.map.events.add('click', this.onClickMap);
                 this.searchControl = new ymaps.control.SearchControl({
                     options: {
@@ -154,7 +167,9 @@ export default {
         // Событие клика по карте
         onClickMap(e) {
             let coords = e.get('coords');
-            this.map.geoObjects.removeAll();
+            if (this.oneMarker) {
+                this.map.geoObjects.remove(this.oneMarker);
+            }
             this.oneMarker = new ymaps.Placemark(coords);
             this.map.geoObjects.add( this.oneMarker);
             this.$emit("ClickMap", coords);
@@ -207,16 +222,28 @@ export default {
             }
         },
         currentCoords: {
-        deep: true,
-        handler(currVal, oldVal) {
-            if (currVal && this.map) {
-                 this.map.setCenter(currVal);
-                 this.map.setZoom(18, { checkZoomRange: true, smooth: true, duration: 300 },)
-                 setTimeout(() => {
-                     document.querySelector('#zoom-in').click();
-                 }, 300)
+            deep: true,
+            handler(currVal, oldVal) {
+                if (currVal && this.map) {
+                    this.map.setCenter(currVal);
+                    this.map.setZoom(18, { checkZoomRange: true, smooth: true, duration: 300 },)
+                    setTimeout(() => {
+                        document.querySelector('#zoom-in').click();
+                    }, 300)
+                }
             }
-          }
+        },
+        isMarkerOnClick: (newValue) => {
+            if (newValue) {
+                this.map.events.add('click', this.onClickMap);
+                if(this.oneMarkerCoords) {
+                    this.oneMarker = new ymaps.Placemark(this.oneMarkerCoords);
+                    this.map.geoObjects.add(this.oneMarker);
+                }
+            } else {
+                this.map.events.remove('click', this.onClickMap);
+                this.map.geoObjects.remove(this.oneMarker);
+            }
         }
     },
     beforeDestroy() {
