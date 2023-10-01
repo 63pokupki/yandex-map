@@ -533,7 +533,7 @@ exports.default = {
                                     this.map.controls.add(this.searchControl);
                                     this.searchControl.events.add('resultselect', this.Search);
                                 } else {
-                                    this.setMarkers();
+                                    this.objectManager.objects.events.add(['click'], this.onClickEvent);
                                 }
 
                                 this.map.events.add(['boundschange', 'datachange', 'objecttypeschange'], this.getVisibleObjects.bind(this));
@@ -565,13 +565,6 @@ exports.default = {
             }
 
             this.$emit("getVisibleObjects", aVisibleCoords);
-        },
-
-
-        // Установка маркеров на карте
-        setMarkers: function setMarkers() {
-            console.log('setMarkers');
-            this.objectManager.objects.events.add(['click'], this.onClickEvent);
         },
 
 
@@ -624,7 +617,6 @@ exports.default = {
         coordsCenter: function coordsCenter() {
             if (this.coordsCenter && this.map) {
                 this.map.setCenter(this.coordsCenter);
-                this.setMarkers();
             }
         },
         markers: {
@@ -637,6 +629,7 @@ exports.default = {
                                     if (this.mapCustom) {
                                         this.mapCustom.markers = this.markers;
                                         this.objectManager = this.mapCustom.fInitMapObjects();
+                                        this.objectManager.objects.events.add(['click'], this.onClickEvent);
                                     }
 
                                 case 1:
@@ -719,6 +712,25 @@ if (typeof window !== 'undefined') {
 
 // Indicate to webpack that this file can be concatenated
 exports.default = null;
+
+/***/ }),
+
+/***/ "2632":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
+__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=fcbd2c8a&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=fcbd2c8a&
+
 
 /***/ }),
 
@@ -970,7 +982,7 @@ function normalizeComponent (
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _YandexMap_vue_vue_type_template_id_1e03cf0d___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("cd4a");
+/* harmony import */ var _YandexMap_vue_vue_type_template_id_fcbd2c8a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("2632");
 /* harmony import */ var _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("3d5c");
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("2877");
@@ -983,8 +995,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[/* default */ "a"])(
   _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _YandexMap_vue_vue_type_template_id_1e03cf0d___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
-  _YandexMap_vue_vue_type_template_id_1e03cf0d___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
+  _YandexMap_vue_vue_type_template_id_fcbd2c8a___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
+  _YandexMap_vue_vue_type_template_id_fcbd2c8a___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
   false,
   null,
   null,
@@ -2210,25 +2222,6 @@ if (hadRuntime) {
     g.regeneratorRuntime = undefined;
   }
 }
-
-/***/ }),
-
-/***/ "cd4a":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
-__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"0565fab2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=1e03cf0d&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
-var staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=1e03cf0d&
-
 
 /***/ }),
 

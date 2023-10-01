@@ -126,7 +126,7 @@ export default {
                 this.searchControl.events.add('resultselect', this.Search);
             } 
             else {
-                this.setMarkers();
+                this.objectManager.objects.events.add(['click'], this.onClickEvent);
             }
 
             this.map.events.add(['boundschange','datachange','objecttypeschange'], this.getVisibleObjects.bind(this));
@@ -143,11 +143,6 @@ export default {
             }
 
             this.$emit("getVisibleObjects", aVisibleCoords);   
-        },
-        
-        // Установка маркеров на карте
-        setMarkers() {
-            this.objectManager.objects.events.add(['click'], this.onClickEvent);
         },
 
         // Событие клика на маркер
@@ -196,7 +191,6 @@ export default {
         coordsCenter: function() {
             if (this.coordsCenter && this.map) {
                 this.map.setCenter(this.coordsCenter);
-                this.setMarkers();
             }
         },
         markers: {
@@ -204,6 +198,7 @@ export default {
                 if (this.mapCustom) {
                     this.mapCustom.markers = this.markers
                     this.objectManager = this.mapCustom.fInitMapObjects()
+                    this.objectManager.objects.events.add(['click'], this.onClickEvent);
                 }
             }
         },
