@@ -8,12 +8,11 @@ export function fAddTemplateToMap(Cls, ctx) {
 }
 
 /** Добавить на карту объекты */
-export function fAddBaloonToMap(Cls, pathToBaloon, ctx) {
+export function fAddBaloonToMap(Cls, ctx) {
 	const cls = new Cls({
 		Map: ctx.Map, 
 		markers: ctx.markers,
-		pathToBaloon,
-		clusters: ctx.clusters,
+		pathToBaloon: ctx.pathToBaloon,
 	});
 	return cls.fCreate();
 }

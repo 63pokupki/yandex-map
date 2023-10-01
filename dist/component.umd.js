@@ -113,94 +113,74 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var YMapsObjects = exports.YMapsObjects = function () {
 
     /**
-     * @param {{Map: any, markers: Array, pathToBaloon: string, clusters: Array}} params
+     * @param {{Map: any, markers: Array, pathToBaloon: string}} params
      */
 
-    /** Путь до изображения балуна */
-
-    /** Карта */
+    /** Маркеры */
     function YMapsObjects(params) {
         _classCallCheck(this, YMapsObjects);
 
         this.markers = params.markers;
-        this.clusters = params.clusters;
         this.pathToBaloon = params.pathToBaloon;
         this.Map = params.Map;
     }
 
-    /** Создать маркеры для одного кластера */
+    /** Создаем объект контрола, с помощью templateLayoutFactory */
 
-    /** Кластеры, если нужны разные виды маркеров */
+    /** Путь до изображения балуна */
 
-    /** Маркеры */
+    /** Карта */
 
 
     _createClass(YMapsObjects, [{
-        key: 'fCreateMarkers',
-        value: function fCreateMarkers(markers, pathToBaloon) {
-            var objectManager = new ymaps.ObjectManager({
+        key: 'fCreate',
+        value: function fCreate() {
+            this.Map.geoObjects.removeAll();
+            var objectManagerConfig = {
                 // Чтобы метки начали кластеризоваться, выставляем опцию.
                 clusterize: true,
                 // Опции для кастомной иконки одиночной метки
                 geoObjectIconLayout: 'default#image',
-                // Своё изображение иконки метки.
-                geoObjectIconImageHref: pathToBaloon,
                 // Размеры метки.
                 geoObjectIconImageSize: [50, 50],
                 // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
-                geoObjectIconImageOffset: [-25, -50],
+                geoObjectIconImageOffset: [-25, -50]
                 // Опции для кастомной иконки кластера
-                clusterIconLayout: 'default#image',
-                // Своё изображение иконки метки.
-                clusterIconImageHref: pathToBaloon,
+                // clusterIconLayout: 'default#image',
                 // Размеры метки.
-                clusterIconImageSize: [70, 70],
-                // Смещение левого верхнего угла иконки относительно
-                // её "ножки" (точки привязки).
-                clusterIconImageOffset: [-35, -70]
-            });
+                // clusterIconImageSize: [70, 70],
+                // // Смещение левого верхнего угла иконки относительно
+                // // её "ножки" (точки привязки).
+                // clusterIconImageOffset: [-35, -70],
+            };
+            if (this.pathToBaloon) {
+                // Своё изображение иконки метки.
+                objectManagerConfig.geoObjectIconImageHref = this.pathToBaloon;
+                objectManagerConfig.clusterIconImageHref = this.pathToBaloon;
+            }
+            var objectManager = new ymaps.ObjectManager(objectManagerConfig);
 
             var objectColection = [];
 
-            for (var i = 0; i < markers.length; i++) {
-                objectColection.push({
+            for (var i = 0; i < this.markers.length; i++) {
+                var oneObject = {
                     type: 'Feature',
-                    id: markers[i].id,
+                    id: this.markers[i].id,
                     geometry: {
                         type: 'Point',
-                        coordinates: [markers[i].latitude, markers[i].longitude]
+                        coordinates: [this.markers[i].latitude, this.markers[i].longitude]
                     }
-                });
+                };
+                if (this.markers[i].iconImageHref) {
+                    oneObject.options = {
+                        iconImageHref: this.markers[i].iconImageHref
+                    };
+                }
+                objectColection.push(oneObject);
             }
             objectManager.add(objectColection);
             this.Map.geoObjects.add(objectManager);
-        }
-
-        /** Создать множество кластеров */
-
-    }, {
-        key: 'fCreateMultipleClusters',
-        value: function fCreateMultipleClusters(clusters) {
-            for (var i = 0; i < clusters.length; i++) {
-                this.fCreateMarkers(clusters.markers, clusters.pathToBaloon);
-            }
-        }
-
-        /** Создаем объект контрола, с помощью templateLayoutFactory */
-
-    }, {
-        key: 'fCreate',
-        value: function fCreate() {
-            this.Map.geoObjects.removeAll();
-
-            var objectManager = void 0;
-            if (this.clusters && this.clusters.length) {
-                objectManager = this.fCreateMultipleClusters(this.clusters);
-            } else {
-                objectManager = this.fCreateMarkers(this.markers, this.pathToBaloon);
-            }
-
-            return this.objectManager;
+            return objectManager;
         }
     }]);
 
@@ -428,17 +408,15 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 exports.default = {
     name: 'YandexMap',
     props: {
-        markers: {
-            type: Array,
-            default: null
-        },
         /**
          * список кластеров
-         * @type {Array.<{markers: {id:number, latitude:string, longitude: string}[], pathToBaloon: string}>} 
+         * @type {Array.<{id:number, latitude:string, longitude: string, iconImageHref: string}>} 
          */
-        clusters: {
+        markers: {
             type: Array,
-            default: []
+            default: function _default() {
+                return [];
+            }
         },
         /**
          * Ставить ли маркер по клику
@@ -469,6 +447,7 @@ exports.default = {
 
     data: function data() {
         return {
+            mapCustom: null,
             map: null,
             coords: [],
             objectManager: null,
@@ -500,7 +479,7 @@ exports.default = {
         // Инициализация карты
         initializeYandexMap: function () {
             var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-                var markers, Map, _ref2, map, map_objects, search_control, zoom_control;
+                var markers, _ref2, map, map_objects, search_control, zoom_control;
 
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
@@ -514,12 +493,11 @@ exports.default = {
                                 }
 
                                 // Создаём объект карты
-                                Map = new _YandexMap.YMapsCustom({
+                                this.mapCustom = new _YandexMap.YMapsCustom({
                                     mapId: this.mapId,
                                     center: this.coordsCenter,
                                     controls: [],
                                     markers: markers,
-                                    clusters: this.clusters,
                                     zoomOptions: {
                                         zoom: 10,
                                         minZoom: 10,
@@ -528,8 +506,9 @@ exports.default = {
                                     pathToBaloon: this.pathToBaloon,
                                     putMarkerInSearch: this.putMarkerInSearch
                                 });
+
                                 _context.next = 5;
-                                return Map.faInitMap();
+                                return this.mapCustom.faInitMap();
 
                             case 5:
                                 _ref2 = _context.sent;
@@ -562,10 +541,11 @@ exports.default = {
                                     }
                                     this.map.controls.add(this.searchControl);
                                     this.searchControl.events.add('resultselect', this.Search);
-                                } else this.setMarkers();
+                                } else {
+                                    this.setMarkers();
+                                }
 
                                 this.map.events.add(['boundschange', 'datachange', 'objecttypeschange'], this.getVisibleObjects.bind(this));
-
                                 this.$emit("InitializeYandexMap", this.map);
 
                             case 17:
@@ -599,12 +579,14 @@ exports.default = {
 
         // Установка маркеров на карте
         setMarkers: function setMarkers() {
+            console.log('setMarkers');
             this.objectManager.objects.events.add(['click'], this.onClickEvent);
         },
 
 
         // Событие клика на маркер
         onClickEvent: function onClickEvent(e) {
+            console.log('onClickEvent');
             var objectId = e.get('objectId'),
                 objectGeometry = this.objectManager.objects.getById(objectId).geometry.type;
             // Если событие произошло на метке, изменяем цвет ее иконки.
@@ -657,29 +639,16 @@ exports.default = {
         markers: {
             handler: function () {
                 var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-                    var objectColection, i;
                     return _regenerator2.default.wrap(function _callee2$(_context2) {
                         while (1) {
                             switch (_context2.prev = _context2.next) {
                                 case 0:
-                                    this.objectManager.removeAll();
-                                    objectColection = [];
-
-
-                                    for (i = 0; i < this.markers.length; i++) {
-                                        objectColection.push({
-                                            type: 'Feature',
-                                            id: this.markers[i].id,
-                                            geometry: {
-                                                type: 'Point',
-                                                coordinates: [this.markers[i].latitude, this.markers[i].longitude]
-                                            }
-                                        });
+                                    if (this.mapCustom) {
+                                        this.mapCustom.markers = this.markers;
+                                        this.objectManager = this.mapCustom.fInitMapObjects();
                                     }
 
-                                    this.objectManager.add(objectColection);
-
-                                case 4:
+                                case 1:
                                 case 'end':
                                     return _context2.stop();
                             }
@@ -801,9 +770,9 @@ var YMapsCustom = exports.YMapsCustom = function () {
 
     /** Начальные опции зума */
 
-    /** Маркеры на карте */
+    /** Элементы управления для отрисовки */
 
-    /** Координаты центра */
+    /** Id карты */
     function YMapsCustom(MapConfig) {
         _classCallCheck(this, YMapsCustom);
 
@@ -811,26 +780,28 @@ var YMapsCustom = exports.YMapsCustom = function () {
         this.center = MapConfig.center;
         this.controls = MapConfig.controls;
         this.markers = MapConfig.markers;
-        this.clusters = MapConfig.clusters;
         this.zoomOptions = MapConfig.zoomOptions;
         this.pathToBaloon = MapConfig.pathToBaloon;
         this.putMarkerInSearch = MapConfig.putMarkerInSearch;
     }
-
-    /** Инициализация карты */
-
     /** Путь до изображения балуна */
 
     /** Объект карты */
 
-    /** Кластеры, если нужны разные виды маркеров */
+    /** Маркеры на карте */
 
-    /** Элементы управления для отрисовки */
-
-    /** Id карты */
+    /** Координаты центра */
 
 
     _createClass(YMapsCustom, [{
+        key: 'fInitMapObjects',
+        value: function fInitMapObjects() {
+            return (0, _YmapsAddTpl.fAddBaloonToMap)(_YMapsObjects.YMapsObjects, this);
+        }
+
+        /** Инициализация карты */
+
+    }, {
         key: 'faInitMap',
         value: function () {
             var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
@@ -865,7 +836,7 @@ var YMapsCustom = exports.YMapsCustom = function () {
                                 this.MapControls.zoom_control = (0, _YmapsAddTpl.fAddTemplateToMap)(_YMapsZoom.YMapsZoom, this);
 
                                 // Добавим объекты на карту
-                                this.MapControls.map_objects = (0, _YmapsAddTpl.fAddBaloonToMap)(_YMapsObjects.YMapsObjects, this.pathToBaloon, this);
+                                this.MapControls.map_objects = this.fInitMapObjects();
 
                                 // Вернем созданные объекты для взаимодействия с Vue
                                 return _context.abrupt('return', {
@@ -1003,31 +974,12 @@ function normalizeComponent (
 
 /***/ }),
 
-/***/ "3882":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
-__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"0565fab2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=c424ffec&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
-var staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=c424ffec&
-
-
-/***/ }),
-
 /***/ "3ac0":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _YandexMap_vue_vue_type_template_id_c424ffec___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("3882");
+/* harmony import */ var _YandexMap_vue_vue_type_template_id_1e03cf0d___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("cd4a");
 /* harmony import */ var _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("3d5c");
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("2877");
@@ -1040,8 +992,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[/* default */ "a"])(
   _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _YandexMap_vue_vue_type_template_id_c424ffec___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
-  _YandexMap_vue_vue_type_template_id_c424ffec___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
+  _YandexMap_vue_vue_type_template_id_1e03cf0d___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
+  _YandexMap_vue_vue_type_template_id_1e03cf0d___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
   false,
   null,
   null,
@@ -2185,12 +2137,11 @@ function fAddTemplateToMap(Cls, ctx) {
 }
 
 /** Добавить на карту объекты */
-function fAddBaloonToMap(Cls, pathToBaloon, ctx) {
+function fAddBaloonToMap(Cls, ctx) {
 	var cls = new Cls({
 		Map: ctx.Map,
 		markers: ctx.markers,
-		pathToBaloon: pathToBaloon,
-		clusters: ctx.clusters
+		pathToBaloon: ctx.pathToBaloon
 	});
 	return cls.fCreate();
 }
@@ -2268,6 +2219,25 @@ if (hadRuntime) {
     g.regeneratorRuntime = undefined;
   }
 }
+
+/***/ }),
+
+/***/ "cd4a":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
+__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"0565fab2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=1e03cf0d&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=1e03cf0d&
+
 
 /***/ }),
 

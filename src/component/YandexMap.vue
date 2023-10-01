@@ -12,17 +12,13 @@ import { YMapsCustom } from './YandexMap';
 export default {
     name: 'YandexMap',
     props : {
-        markers: {
-            type: Array,
-            default: null
-        },
         /**
          * список кластеров
-         * @type {Array.<{markers: {id:number, latitude:string, longitude: string}[], pathToBaloon: string}>} 
+         * @type {Array.<{id:number, latitude:string, longitude: string, iconImageHref: string}>} 
          */
-        clusters: {
+         markers: {
             type: Array,
-            default: []
+            default: () => []
         },
         /**
          * Ставить ли маркер по клику
@@ -53,6 +49,7 @@ export default {
 
     data() {
         return {
+            mapCustom: null,
             map: null,
             coords: [],
             objectManager: null,
@@ -88,12 +85,11 @@ export default {
             }
 
             // Создаём объект карты
-            const Map = new YMapsCustom({ 
+            this.mapCustom = new YMapsCustom({ 
                 mapId: this.mapId,
                 center: this.coordsCenter,
                 controls: [],
                 markers: markers,
-                clusters: this.clusters,
                 zoomOptions: {
                     zoom: 10,
                     minZoom: 10,
@@ -103,7 +99,7 @@ export default {
                 putMarkerInSearch: this.putMarkerInSearch,
             });
 
-            const { map, map_objects, search_control, zoom_control } = await Map.faInitMap();
+            const { map, map_objects, search_control, zoom_control } = await this.mapCustom.faInitMap();
 
             this.map = map;
             this.objectManager = map_objects;
@@ -129,10 +125,11 @@ export default {
                 this.map.controls.add(this.searchControl);
                 this.searchControl.events.add('resultselect', this.Search);
             } 
-            else  this.setMarkers();
+            else {
+                this.setMarkers();
+            }
 
             this.map.events.add(['boundschange','datachange','objecttypeschange'], this.getVisibleObjects.bind(this));
-
             this.$emit("InitializeYandexMap", this.map);           
         },
 
@@ -204,21 +201,10 @@ export default {
         },
         markers: {
             async handler() {
-                this.objectManager.removeAll();
-                const objectColection = [];
-
-                for (let i = 0; i < this.markers.length; i++) {
-                    objectColection.push({
-                        type: 'Feature',
-                        id: this.markers[i].id,
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [this.markers[i].latitude, this.markers[i].longitude]
-                        },
-                    })
+                if (this.mapCustom) {
+                    this.mapCustom.markers = this.markers
+                    this.objectManager = this.mapCustom.fInitMapObjects()
                 }
-
-                this.objectManager.add(objectColection);
             }
         },
         currentCoords: {

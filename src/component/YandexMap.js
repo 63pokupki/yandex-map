@@ -14,8 +14,6 @@ export class YMapsCustom {
     controls;
     /** Маркеры на карте */
     markers;
-    /** Кластеры, если нужны разные виды маркеров */
-    clusters;
     /** Начальные опции зума */
     zoomOptions;
     /** Объект карты */
@@ -30,10 +28,13 @@ export class YMapsCustom {
         this.center = MapConfig.center;
         this.controls = MapConfig.controls;
         this.markers = MapConfig.markers;
-        this.clusters = MapConfig.clusters;
         this.zoomOptions = MapConfig.zoomOptions;
         this.pathToBaloon = MapConfig.pathToBaloon;
         this.putMarkerInSearch = MapConfig.putMarkerInSearch;
+    }
+
+    fInitMapObjects() {
+        return fAddBaloonToMap(YMapsObjects, this);
     }
 
     /** Инициализация карты */
@@ -59,10 +60,10 @@ export class YMapsCustom {
         this.MapControls.search_control = fAddMarkerToMap(YMapsSearch, this);
 
         // Добавим кастомный элемент зума карты
-        this.MapControls.zoom_control  = fAddTemplateToMap(YMapsZoom, this);
+        this.MapControls.zoom_control = fAddTemplateToMap(YMapsZoom, this);
 
         // Добавим объекты на карту
-        this.MapControls.map_objects = fAddBaloonToMap(YMapsObjects, this.pathToBaloon, this);
+        this.MapControls.map_objects = this.fInitMapObjects();
 
         // Вернем созданные объекты для взаимодействия с Vue
         return {
