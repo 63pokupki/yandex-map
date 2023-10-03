@@ -18,6 +18,34 @@ export class YMapsObjects {
     /** Создаем объект контрола, с помощью templateLayoutFactory */
     fCreate() {
         this.Map.geoObjects.removeAll();
+
+        const test = ymaps.templateLayoutFactory.createClass('<img>', {
+            build: function () {
+                test.superclass.build.call(this);
+
+                const imgElement = this.getParentElement().querySelector('img')
+                console.log(imgElement)
+
+                console.log(this.getData().features.map(e => e.options.iconImageHref))
+                const aFeatures = this.getData().features
+                const ixFrequent = {}
+                let sIconMostFrequent = aFeatures[0].options.iconImageHref
+                for (let i = 0; i<aFeatures.length; i++) {
+                    const sIcon = ixFrequent[i].options.iconImageHref
+                    if (ixFrequent[sIcon]) {
+                        ixFrequent[sIcon]++
+                    } else {
+                        ixFrequent[sIcon] = 0
+                        if (ixFrequent[sIcon] > ixFrequent[sIconMostFrequent]) {
+                            sIconMostFrequent = sIcon
+                        }
+                    }
+                }
+                imgElement.src = sIconMostFrequent
+
+			},
+        });
+        
         const objectManagerConfig = {
             // Чтобы метки начали кластеризоваться, выставляем опцию.
             clusterize: true,
@@ -27,6 +55,7 @@ export class YMapsObjects {
             geoObjectIconImageSize: [50, 50], 
             // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
             geoObjectIconImageOffset: [-25, -50],
+            clusterIconLayout: test
             // Опции для кастомной иконки кластера
             // clusterIconLayout: 'default#image',
             // Размеры метки.

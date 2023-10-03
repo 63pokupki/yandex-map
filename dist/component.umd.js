@@ -136,6 +136,35 @@ var YMapsObjects = exports.YMapsObjects = function () {
         key: 'fCreate',
         value: function fCreate() {
             this.Map.geoObjects.removeAll();
+
+            var test = ymaps.templateLayoutFactory.createClass('<img>', {
+                build: function build() {
+                    test.superclass.build.call(this);
+
+                    var imgElement = this.getParentElement().querySelector('img');
+                    console.log(imgElement);
+
+                    console.log(this.getData().features.map(function (e) {
+                        return e.options.iconImageHref;
+                    }));
+                    var aFeatures = this.getData().features;
+                    var ixFrequent = {};
+                    var sIconMostFrequent = aFeatures[0].options.iconImageHref;
+                    for (var i = 0; i < aFeatures.length; i++) {
+                        var sIcon = ixFrequent[i].options.iconImageHref;
+                        if (ixFrequent[sIcon]) {
+                            ixFrequent[sIcon]++;
+                        } else {
+                            ixFrequent[sIcon] = 0;
+                            if (ixFrequent[sIcon] > ixFrequent[sIconMostFrequent]) {
+                                sIconMostFrequent = sIcon;
+                            }
+                        }
+                    }
+                    imgElement.src = sIconMostFrequent;
+                }
+            });
+
             var objectManagerConfig = {
                 // Чтобы метки начали кластеризоваться, выставляем опцию.
                 clusterize: true,
@@ -144,7 +173,8 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 // Размеры метки.
                 geoObjectIconImageSize: [50, 50],
                 // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
-                geoObjectIconImageOffset: [-25, -50]
+                geoObjectIconImageOffset: [-25, -50],
+                clusterIconLayout: test
                 // Опции для кастомной иконки кластера
                 // clusterIconLayout: 'default#image',
                 // Размеры метки.
@@ -579,7 +609,6 @@ exports.default = {
 
         // Событие клика на маркер
         onClickEvent: function onClickEvent(e) {
-            console.log('onClickEvent');
             var objectId = e.get('objectId'),
                 objectGeometry = this.objectManager.objects.getById(objectId).geometry.type;
             // Если событие произошло на метке, изменяем цвет ее иконки.
@@ -721,25 +750,6 @@ if (typeof window !== 'undefined') {
 
 // Indicate to webpack that this file can be concatenated
 exports.default = null;
-
-/***/ }),
-
-/***/ "2632":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
-__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=fcbd2c8a&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
-var staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=fcbd2c8a&
-
 
 /***/ }),
 
@@ -991,7 +1001,7 @@ function normalizeComponent (
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _YandexMap_vue_vue_type_template_id_fcbd2c8a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("2632");
+/* harmony import */ var _YandexMap_vue_vue_type_template_id_382dd0e0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("5839");
 /* harmony import */ var _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("3d5c");
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("2877");
@@ -1004,8 +1014,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[/* default */ "a"])(
   _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _YandexMap_vue_vue_type_template_id_fcbd2c8a___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
-  _YandexMap_vue_vue_type_template_id_fcbd2c8a___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
+  _YandexMap_vue_vue_type_template_id_382dd0e0___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
+  _YandexMap_vue_vue_type_template_id_382dd0e0___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
   false,
   null,
   null,
@@ -1026,6 +1036,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
  /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "5839":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
+__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=382dd0e0&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=382dd0e0&
+
 
 /***/ }),
 
