@@ -128,21 +128,17 @@ var YMapsObjects = exports.YMapsObjects = function () {
         value: function fCreate() {
             this.Map.geoObjects.removeAll();
 
-            var test = ymaps.templateLayoutFactory.createClass('<img>', {
+            var test = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
                 build: function build() {
                     test.superclass.build.call(this);
 
                     var imgElement = this.getParentElement().querySelector('img');
-                    console.log(imgElement);
 
-                    console.log(this.getData().features.map(function (e) {
-                        return e.options.iconImageHref;
-                    }));
                     var aFeatures = this.getData().features;
                     var ixFrequent = {};
                     var sIconMostFrequent = aFeatures[0].options.iconImageHref;
                     for (var i = 0; i < aFeatures.length; i++) {
-                        var sIcon = ixFrequent[i].options.iconImageHref;
+                        var sIcon = aFeatures[i].options.iconImageHref;
                         if (ixFrequent[sIcon]) {
                             ixFrequent[sIcon]++;
                         } else {
@@ -152,7 +148,9 @@ var YMapsObjects = exports.YMapsObjects = function () {
                             }
                         }
                     }
+
                     imgElement.src = sIconMostFrequent;
+                    console.log(imgElement);
                 }
             });
 
@@ -165,14 +163,14 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 geoObjectIconImageSize: [50, 50],
                 // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
                 geoObjectIconImageOffset: [-25, -50],
-                clusterIconLayout: test
+                clusterIconLayout: test,
                 // Опции для кастомной иконки кластера
                 // clusterIconLayout: 'default#image',
                 // Размеры метки.
-                // clusterIconImageSize: [70, 70],
-                // // Смещение левого верхнего угла иконки относительно
-                // // её "ножки" (точки привязки).
-                // clusterIconImageOffset: [-35, -70],
+                clusterIconImageSize: [70, 70],
+                // Смещение левого верхнего угла иконки относительно
+                // её "ножки" (точки привязки).
+                clusterIconImageOffset: [-35, -70]
             };
             if (this.pathToBaloon) {
                 // Своё изображение иконки метки.

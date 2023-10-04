@@ -19,19 +19,17 @@ export class YMapsObjects {
     fCreate() {
         this.Map.geoObjects.removeAll();
 
-        const test = ymaps.templateLayoutFactory.createClass('<img>', {
+        const mostFrequentIcon = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
             build: function () {
                 test.superclass.build.call(this);
 
                 const imgElement = this.getParentElement().querySelector('img')
-                console.log(imgElement)
 
-                console.log(this.getData().features.map(e => e.options.iconImageHref))
                 const aFeatures = this.getData().features
                 const ixFrequent = {}
                 let sIconMostFrequent = aFeatures[0].options.iconImageHref
                 for (let i = 0; i<aFeatures.length; i++) {
-                    const sIcon = ixFrequent[i].options.iconImageHref
+                    const sIcon = aFeatures[i].options.iconImageHref
                     if (ixFrequent[sIcon]) {
                         ixFrequent[sIcon]++
                     } else {
@@ -41,6 +39,7 @@ export class YMapsObjects {
                         }
                     }
                 }
+                
                 imgElement.src = sIconMostFrequent
 
 			},
@@ -55,14 +54,14 @@ export class YMapsObjects {
             geoObjectIconImageSize: [50, 50], 
             // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
             geoObjectIconImageOffset: [-25, -50],
-            clusterIconLayout: test
+            clusterIconLayout: mostFrequentIcon,
             // Опции для кастомной иконки кластера
             // clusterIconLayout: 'default#image',
             // Размеры метки.
-            // clusterIconImageSize: [70, 70],
-            // // Смещение левого верхнего угла иконки относительно
-            // // её "ножки" (точки привязки).
-            // clusterIconImageOffset: [-35, -70],
+            clusterIconImageSize: [70, 70],
+            // Смещение левого верхнего угла иконки относительно
+            // её "ножки" (точки привязки).
+            clusterIconImageOffset: [-35, -70],
         }
         if (this.pathToBaloon) {
             // Своё изображение иконки метки.
