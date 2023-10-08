@@ -125,7 +125,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
         this.Map = params.Map;
     }
 
-    /** Создаем объект контрола, с помощью templateLayoutFactory */
+    /** Получить шаблок для отображение самой часто встречаемой иконки внутри кластера */
 
     /** Путь до изображения балуна */
 
@@ -133,13 +133,11 @@ var YMapsObjects = exports.YMapsObjects = function () {
 
 
     _createClass(YMapsObjects, [{
-        key: 'fCreate',
-        value: function fCreate() {
-            this.Map.geoObjects.removeAll();
-
-            var test = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
+        key: 'fGetMostFrequentItemTemplate',
+        value: function fGetMostFrequentItemTemplate() {
+            var mostFrequentIcon = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
                 build: function build() {
-                    test.superclass.build.call(this);
+                    mostFrequentIcon.superclass.build.call(this);
 
                     var imgElement = this.getParentElement().querySelector('img');
 
@@ -159,9 +157,18 @@ var YMapsObjects = exports.YMapsObjects = function () {
                     }
 
                     imgElement.src = sIconMostFrequent;
-                    console.log(imgElement);
                 }
             });
+            console.log(mostFrequentIcon);
+            return mostFrequentIcon;
+        }
+
+        /** Создаем объект контрола, с помощью templateLayoutFactory */
+
+    }, {
+        key: 'fCreate',
+        value: function fCreate() {
+            this.Map.geoObjects.removeAll();
 
             var objectManagerConfig = {
                 // Чтобы метки начали кластеризоваться, выставляем опцию.
@@ -171,20 +178,20 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 // Размеры метки.
                 geoObjectIconImageSize: [50, 50],
                 // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
-                geoObjectIconImageOffset: [-25, -50],
-                clusterIconLayout: test,
-                // Опции для кастомной иконки кластера
-                // clusterIconLayout: 'default#image',
-                // Размеры метки.
-                clusterIconImageSize: [70, 70],
-                // Смещение левого верхнего угла иконки относительно
-                // её "ножки" (точки привязки).
-                clusterIconImageOffset: [-35, -70]
+                geoObjectIconImageOffset: [-25, -50]
             };
             if (this.pathToBaloon) {
                 // Своё изображение иконки метки.
-                objectManagerConfig.geoObjectIconImageHref = this.pathToBaloon;
                 objectManagerConfig.clusterIconImageHref = this.pathToBaloon;
+                // Опции для кастомной иконки кластера
+                objectManagerConfig.clusterIconLayout = 'default#image';
+                // Размеры метки.
+                objectManagerConfig.clusterIconImageSize = [70, 70];
+                // Смещение левого верхнего угла иконки относительно
+                // её "ножки" (точки привязки).
+                objectManagerConfig.clusterIconImageOffset = [-35, -70];
+            } else {
+                objectManagerConfig.clusterIconLayout = this.fGetMostFrequentItemTemplate();
             }
             var objectManager = new ymaps.ObjectManager(objectManagerConfig);
 

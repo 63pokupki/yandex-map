@@ -15,13 +15,11 @@ export class YMapsObjects {
         this.Map = params.Map;
     }
 
-    /** Создаем объект контрола, с помощью templateLayoutFactory */
-    fCreate() {
-        this.Map.geoObjects.removeAll();
-
+    /** Получить шаблок для отображение самой часто встречаемой иконки внутри кластера */
+    fGetMostFrequentItemTemplate() {
         const mostFrequentIcon = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
             build: function () {
-                test.superclass.build.call(this);
+                mostFrequentIcon.superclass.build.call(this);
 
                 const imgElement = this.getParentElement().querySelector('img')
 
@@ -44,6 +42,12 @@ export class YMapsObjects {
 
 			},
         });
+        return mostFrequentIcon
+    }
+
+    /** Создаем объект контрола, с помощью templateLayoutFactory */
+    fCreate() {
+        this.Map.geoObjects.removeAll();
         
         const objectManagerConfig = {
             // Чтобы метки начали кластеризоваться, выставляем опцию.
@@ -54,19 +58,19 @@ export class YMapsObjects {
             geoObjectIconImageSize: [50, 50], 
             // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
             geoObjectIconImageOffset: [-25, -50],
-            clusterIconLayout: mostFrequentIcon,
-            // Опции для кастомной иконки кластера
-            // clusterIconLayout: 'default#image',
-            // Размеры метки.
-            clusterIconImageSize: [70, 70],
-            // Смещение левого верхнего угла иконки относительно
-            // её "ножки" (точки привязки).
-            clusterIconImageOffset: [-35, -70],
         }
         if (this.pathToBaloon) {
             // Своё изображение иконки метки.
-            objectManagerConfig.geoObjectIconImageHref = this.pathToBaloon
             objectManagerConfig.clusterIconImageHref = this.pathToBaloon
+            // Опции для кастомной иконки кластера
+            objectManagerConfig.clusterIconLayout = 'default#image'
+            // Размеры метки.
+            objectManagerConfig.clusterIconImageSize = [70, 70]
+            // Смещение левого верхнего угла иконки относительно
+            // её "ножки" (точки привязки).
+            objectManagerConfig.clusterIconImageOffset = [-35, -70]
+        } else {
+            objectManagerConfig.clusterIconLayout = this.fGetMostFrequentItemTemplate()
         }
         const objectManager = new ymaps.ObjectManager(objectManagerConfig);
 
