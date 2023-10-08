@@ -150,7 +150,6 @@ var YMapsObjects = exports.YMapsObjects = function () {
                     imgElement.src = sIconMostFrequent;
                 }
             });
-            console.log(mostFrequentIcon);
             return mostFrequentIcon;
         }
 
@@ -183,6 +182,13 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 objectManagerConfig.clusterIconImageOffset = [-35, -70];
             } else {
                 objectManagerConfig.clusterIconLayout = this.fGetMostFrequentItemTemplate();
+                // objectManagerConfig.clusterDisableClickZoom = false
+                // objectManagerConfig.clusterOpenBalloonOnClick = true
+                objectManagerConfig.clusterIconShape = {
+                    type: 'Circle',
+                    coordinates: [0, -25],
+                    radius: 50
+                };
             }
             var objectManager = new ymaps.ObjectManager(objectManagerConfig);
 
@@ -200,6 +206,10 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 if (this.markers[i].iconImageHref) {
                     oneObject.options = {
                         iconImageHref: this.markers[i].iconImageHref
+                    };
+                    oneObject.properties = {
+                        balloonContent: 'балууунн',
+                        hintContent: 'Подскаазкаа'
                     };
                 }
                 objectColection.push(oneObject);

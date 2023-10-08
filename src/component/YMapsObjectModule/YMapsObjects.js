@@ -71,6 +71,11 @@ export class YMapsObjects {
             objectManagerConfig.clusterIconImageOffset = [-35, -70]
         } else {
             objectManagerConfig.clusterIconLayout = this.fGetMostFrequentItemTemplate()
+            objectManagerConfig.clusterIconShape = {
+                type: 'Circle',
+                coordinates: [0, -25],
+                radius: 50,
+            }
         }
         const objectManager = new ymaps.ObjectManager(objectManagerConfig);
 
@@ -88,6 +93,10 @@ export class YMapsObjects {
             if (this.markers[i].iconImageHref) {
                 oneObject.options = {
                     iconImageHref: this.markers[i].iconImageHref
+                }
+                oneObject.properties = {
+                    balloonContent: 'балууунн',
+                    hintContent: 'Подскаазкаа'
                 }
             }
             objectColection.push(oneObject)
