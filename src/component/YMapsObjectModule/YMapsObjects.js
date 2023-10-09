@@ -48,12 +48,12 @@ export class YMapsObjects {
     /** Получить шаблон балуна */
     fGetBalloonLayout() {
         const myBalloonLayout = ymaps.templateLayoutFactory.createClass(
-            '<div class="popover top">' +
-            '<a class="close" href="#">&times;</a>' +
-            '<div class="arrow"></div>' +
-            '<div class="popover-inner">' +
+            '<div class="ymap-pvz-popover">' +
+            '<div class="ymap-pvz-popover-close">&times;</div>' +
+            '<div class="ymap-pvz-popover-inner">' +
             '$[[options.contentLayout observeSize minWidth=235 maxWidth=235 maxHeight=350]]' +
             '</div>' +
+            '<div class="ymap-pvz-popover-arrow"></div>' +
             '</div>', {
             /**
              * Строит экземпляр макета на основе шаблона и добавляет его в родительский HTML-элемент.
@@ -64,11 +64,13 @@ export class YMapsObjects {
             build: function () {
                 this.constructor.superclass.build.call(this);
 
-                this._$element = $('.popover', this.getParentElement());
+                console.log('build')
+                this._$element = $('.ymap-pvz-popover', this.getParentElement());
 
+                console.log('build', this._$element)
                 this.applyElementOffset();
 
-                this._$element.find('.close')
+                this._$element.find('.ymap-pvz-popover-close')
                     .on('click', $.proxy(this.onCloseClick, this));
             },
 
@@ -79,7 +81,7 @@ export class YMapsObjects {
              * @name clear
              */
             clear: function () {
-                this._$element.find('.close')
+                this._$element.find('.ymap-pvz-popover-close')
                     .off('click');
 
                 this.constructor.superclass.clear.call(this);
@@ -112,8 +114,9 @@ export class YMapsObjects {
             applyElementOffset: function () {
                 this._$element.css({
                     left: -(this._$element[0].offsetWidth / 2),
-                    top: -(this._$element[0].offsetHeight + this._$element.find('.arrow')[0].offsetHeight)
+                    top: -(this._$element[0].offsetHeight + this._$element.find('.ymap-pvz-popover-arrow')[0].offsetHeight)
                 });
+                console.log(-(this._$element[0].offsetWidth / 2))
             },
 
             /**
@@ -145,7 +148,7 @@ export class YMapsObjects {
                 return new ymaps.shape.Rectangle(new ymaps.geometry.pixel.Rectangle([
                     [position.left, position.top], [
                         position.left + this._$element[0].offsetWidth,
-                        position.top + this._$element[0].offsetHeight + this._$element.find('.arrow')[0].offsetHeight
+                        position.top + this._$element[0].offsetHeight + this._$element.find('.ymap-pvz-popover-arrow')[0].offsetHeight
                     ]
                 ]));
             },
@@ -159,7 +162,7 @@ export class YMapsObjects {
              * @returns {Boolean} Флаг наличия.
              */
             _isElement: function (element) {
-                return element && element[0] && element.find('.arrow')[0];
+                return element && element[0] && element.find('.ymap-pvz-popover-arrow')[0];
             }
         })
         return myBalloonLayout

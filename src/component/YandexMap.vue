@@ -235,3 +235,41 @@ export default {
 }
 
 </script>
+
+
+<style>
+.ymap-pvz-popover {
+    background: white;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 0 8px rgba(0,0,0,.15);
+    width: fit-content;
+}
+.ymap-pvz-popover-close {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #4F4F50;
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+.ymap-pvz-popover-arrow {
+    display: block;
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    left: calc(50% - 3px);
+    bottom: -3px;
+    background-color: inherit;
+    transform: rotate(45deg);
+    box-shadow: 0 0 8px rgba(0,0,0,.15);
+}
+.ymap-pvz-popover-inner {
+    
+}
+</style>

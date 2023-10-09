@@ -13,5 +13,6 @@ module.exports = {
         .test(/\.vue$/)
         .use('vue-loader')
         .loader('vue-loader')
-    }
+    },
+    css: { extract: false }
 }
