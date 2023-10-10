@@ -175,7 +175,6 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @name build
                  */
                 build: function build() {
-                    console.log(123);
                     this.constructor.superclass.build.call(this);
 
                     this._$element = this.getParentElement().querySelector('.ymap-pvz-popover');
@@ -226,7 +225,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 applyElementOffset: function applyElementOffset() {
                     var nLeft = -(this._$element.offsetWidth / 2);
                     var nArrowHeight = 6;
-                    var nTop = -(this._$element.offsetHeight + nArrowHeight);
+                    var nTop = -(this._$element.offsetHeight + nArrowHeight + 52);
                     this._$element.style.left = nLeft + 'px';
                     this._$element.style.top = nTop + 'px';
                 },
@@ -313,8 +312,6 @@ var YMapsObjects = exports.YMapsObjects = function () {
 
             var objectColection = [];
 
-            var BalloonContentLayout = ymaps.templateLayoutFactory.createClass("<div>" + "<b>123</b>" + "</div>");
-
             for (var i = 0; i < this.markers.length; i++) {
                 var vMarker = this.markers[i];
                 var oneObject = {
@@ -325,25 +322,23 @@ var YMapsObjects = exports.YMapsObjects = function () {
                         coordinates: [vMarker.latitude, vMarker.longitude]
                     }
                 };
-                if (vMarker.iconImageHref) {
+                if (vMarker.balloonContent) {
                     oneObject.options = {
-                        iconImageHref: vMarker.iconImageHref,
-                        balloonContentLayout: BalloonContentLayout,
-                        balloonLayout: this.fGetBalloonLayout()
+                        balloonLayout: this.fGetBalloonLayout(),
+                        balloonContentLayout: ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html),
+                        hideIconOnBalloonOpen: false,
+                        balloonPanelMaxMapArea: 0
                     };
                     oneObject.properties = {
                         balloonPanelMaxMapArea: 0
                     };
                 }
-                // if (vMarker.balloonContent) {
-                // if (vMarker.iconImageHref) {
-                //     if (!oneObject.options) {
-                //         oneObject.options = {}
-                //     }
-                //     // oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html, vMarker.balloonContent.methods)
-                //     oneObject.options.balloonLayout = this.fGetBalloonLayout()
-                //     oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass('<div>12312312312</div>')
-                // }
+                if (vMarker.iconImageHref) {
+                    if (!oneObject.options) {
+                        oneObject.options = {};
+                    }
+                    oneObject.options.iconImageHref = vMarker.iconImageHref;
+                }
                 objectColection.push(oneObject);
             }
             objectManager.add(objectColection);

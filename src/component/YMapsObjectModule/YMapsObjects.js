@@ -112,7 +112,7 @@ export class YMapsObjects {
             applyElementOffset: function () {
                 const nLeft = -(this._$element.offsetWidth / 2)
                 const nArrowHeight = 6
-                const nTop = -(this._$element.offsetHeight + nArrowHeight)
+                const nTop = -(this._$element.offsetHeight + nArrowHeight + 52)
                 this._$element.style.left = `${nLeft}px`
                 this._$element.style.top = `${nTop}px`
             },
@@ -201,12 +201,6 @@ export class YMapsObjects {
 
         const objectColection = [];
 
-        const BalloonContentLayout = ymaps.templateLayoutFactory.createClass(
-            "<div>" +
-            "<b>123</b>" +
-            "</div>"
-        );
-
         for (let i = 0; i < this.markers.length; i++) {
             const vMarker = this.markers[i]
             const oneObject = {
@@ -217,25 +211,23 @@ export class YMapsObjects {
                     coordinates: [vMarker.latitude, vMarker.longitude]
                 },
             }
-            if (vMarker.iconImageHref) {
+            if (vMarker.balloonContent) {
                 oneObject.options = {
-                    iconImageHref: vMarker.iconImageHref,
-                    balloonContentLayout: BalloonContentLayout,
                     balloonLayout: this.fGetBalloonLayout(),
+                    balloonContentLayout: ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html),
+                    hideIconOnBalloonOpen: false,
+                    balloonPanelMaxMapArea: 0,
                 }
                 oneObject.properties = {
-                    balloonPanelMaxMapArea: 0
+                    balloonPanelMaxMapArea: 0,
                 }
             }
-            // if (vMarker.balloonContent) {
-            // if (vMarker.iconImageHref) {
-            //     if (!oneObject.options) {
-            //         oneObject.options = {}
-            //     }
-            //     // oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html, vMarker.balloonContent.methods)
-            //     oneObject.options.balloonLayout = this.fGetBalloonLayout()
-            //     oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass('<div>12312312312</div>')
-            // }
+            if (vMarker.iconImageHref) {
+                if (!oneObject.options) {
+                    oneObject.options = {}
+                }
+                oneObject.options.iconImageHref = vMarker.iconImageHref
+            }
             objectColection.push(oneObject)
         }
         objectManager.add(objectColection);
