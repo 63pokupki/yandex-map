@@ -169,12 +169,13 @@ var YMapsObjects = exports.YMapsObjects = function () {
                     this.constructor.superclass.build.call(this);
 
                     console.log('build');
-                    this._$element = $('.ymap-pvz-popover', this.getParentElement());
+                    this._$element = this.getParentElement().querySelector('.ymap-pvz-popover');
 
                     console.log('build', this._$element);
                     this.applyElementOffset();
 
-                    this._$element.find('.ymap-pvz-popover-close').on('click', $.proxy(this.onCloseClick, this));
+                    var elClose = this._$element.querySelector('.ymap-pvz-popover-close');
+                    elClose.addEventListener('click', this.onCloseClick);
                 },
 
                 /**
@@ -184,7 +185,8 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @name clear
                  */
                 clear: function clear() {
-                    this._$element.find('.ymap-pvz-popover-close').off('click');
+                    var elClose = this._$element.querySelector('.ymap-pvz-popover-close');
+                    elClose.removeEventListener('click', this.onCloseClick);
 
                     this.constructor.superclass.clear.call(this);
                 },
@@ -196,7 +198,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @name onSublayoutSizeChange
                  */
                 onSublayoutSizeChange: function onSublayoutSizeChange() {
-                    MyBalloonLayout.superclass.onSublayoutSizeChange.apply(this, arguments);
+                    myBalloonLayout.superclass.onSublayoutSizeChange.apply(this, arguments);
 
                     if (!this._isElement(this._$element)) {
                         return;
@@ -214,11 +216,8 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @name applyElementOffset
                  */
                 applyElementOffset: function applyElementOffset() {
-                    this._$element.css({
-                        left: -(this._$element[0].offsetWidth / 2),
-                        top: -(this._$element[0].offsetHeight + this._$element.find('.ymap-pvz-popover-arrow')[0].offsetHeight)
-                    });
-                    console.log(-(this._$element[0].offsetWidth / 2));
+                    this._$element.style.left = -(this._$element.offsetWidth / 2), this._$element.style.top = -(this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight);
+                    console.log(this._$element);
                 },
 
                 /**
@@ -242,12 +241,12 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  */
                 getShape: function getShape() {
                     if (!this._isElement(this._$element)) {
-                        return MyBalloonLayout.superclass.getShape.call(this);
+                        return myBalloonLayout.superclass.getShape.call(this);
                     }
 
                     var position = this._$element.position();
 
-                    return new ymaps.shape.Rectangle(new ymaps.geometry.pixel.Rectangle([[position.left, position.top], [position.left + this._$element[0].offsetWidth, position.top + this._$element[0].offsetHeight + this._$element.find('.ymap-pvz-popover-arrow')[0].offsetHeight]]));
+                    return new ymaps.shape.Rectangle(new ymaps.geometry.pixel.Rectangle([[position.left, position.top], [position.left + this._$element.offsetWidth, position.top + this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight]]));
                 },
 
                 /**
@@ -259,7 +258,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @returns {Boolean} Флаг наличия.
                  */
                 _isElement: function _isElement(element) {
-                    return element && element[0] && element.find('.ymap-pvz-popover-arrow')[0];
+                    return element && element[0] && element.querySelector('.ymap-pvz-popover-arrow');
                 }
             });
             return myBalloonLayout;
