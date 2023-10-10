@@ -51,7 +51,7 @@ export class YMapsObjects {
             '<div class="ymap-pvz-popover">' +
             '<div class="ymap-pvz-popover-close">&times;</div>' +
             '<div class="ymap-pvz-popover-inner">' +
-            '$[[options.contentLayout observeSize minWidth=235 maxWidth=235 maxHeight=350]]' +
+            '$[[options.contentLayout observeSize]]' +
             '</div>' +
             '<div class="ymap-pvz-popover-arrow"></div>' +
             '</div>', {
@@ -64,14 +64,12 @@ export class YMapsObjects {
             build: function () {
                 this.constructor.superclass.build.call(this);
 
-                console.log('build')
                 this._$element = this.getParentElement().querySelector('.ymap-pvz-popover')
 
-                console.log('build', this._$element)
                 this.applyElementOffset();
 
                 const elClose = this._$element.querySelector('.ymap-pvz-popover-close')
-                elClose.addEventListener('click', this.onCloseClick)
+                elClose.addEventListener('click', this.onCloseClick.bind(this))
             },
 
             /**
@@ -82,7 +80,7 @@ export class YMapsObjects {
              */
             clear: function () {
                 const elClose = this._$element.querySelector('.ymap-pvz-popover-close')
-                elClose.removeEventListener('click', this.onCloseClick)
+                elClose.removeEventListener('click', this.onCloseClick.bind(this))
 
                 this.constructor.superclass.clear.call(this);
             },
@@ -112,9 +110,11 @@ export class YMapsObjects {
              * @name applyElementOffset
              */
             applyElementOffset: function () {
-                this._$element.style.left = -(this._$element.offsetWidth / 2),
-                this._$element.style.top = -(this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight)
-                console.log(this._$element)
+                const nLeft = -(this._$element.offsetWidth / 2)
+                const nArrowHeight = 6
+                const nTop = -(this._$element.offsetHeight + nArrowHeight)
+                this._$element.style.left = `${nLeft}px`
+                this._$element.style.top = `${nTop}px`
             },
 
             /**
@@ -125,7 +125,6 @@ export class YMapsObjects {
              */
             onCloseClick: function (e) {
                 e.preventDefault();
-
                 this.events.fire('userclose');
             },
 
@@ -156,7 +155,7 @@ export class YMapsObjects {
              * @function
              * @private
              * @name _isElement
-             * @param {jQuery} [element] Элемент.
+             * @param {HTMLDivElement} [element] Элемент.
              * @returns {Boolean} Флаг наличия.
              */
             _isElement: function (element) {
@@ -209,17 +208,18 @@ export class YMapsObjects {
         );
 
         for (let i = 0; i < this.markers.length; i++) {
+            const vMarker = this.markers[i]
             const oneObject = {
                 type: 'Feature',
-                id: this.markers[i].id,
+                id: vMarker.id,
                 geometry: {
                     type: 'Point',
-                    coordinates: [this.markers[i].latitude, this.markers[i].longitude]
+                    coordinates: [vMarker.latitude, vMarker.longitude]
                 },
             }
-            if (this.markers[i].iconImageHref) {
+            if (vMarker.iconImageHref) {
                 oneObject.options = {
-                    iconImageHref: this.markers[i].iconImageHref,
+                    iconImageHref: vMarker.iconImageHref,
                     balloonContentLayout: BalloonContentLayout,
                     balloonLayout: this.fGetBalloonLayout(),
                 }
@@ -227,6 +227,15 @@ export class YMapsObjects {
                     balloonPanelMaxMapArea: 0
                 }
             }
+            // if (vMarker.balloonContent) {
+            // if (vMarker.iconImageHref) {
+            //     if (!oneObject.options) {
+            //         oneObject.options = {}
+            //     }
+            //     // oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html, vMarker.balloonContent.methods)
+            //     oneObject.options.balloonLayout = this.fGetBalloonLayout()
+            //     oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass('<div>12312312312</div>')
+            // }
             objectColection.push(oneObject)
         }
         objectManager.add(objectColection);

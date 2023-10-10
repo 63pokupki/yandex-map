@@ -14,7 +14,7 @@ export default {
     props : {
         /**
          * список кластеров
-         * @type {Array.<{id:number, latitude:string, longitude: string, iconImageHref: string}>} 
+         * @type {Array.<{id:number, latitude:string, longitude: string, iconImageHref: string, balloonContent: {html: string, methods: object}}>} 
          */
          markers: {
             type: Array,
@@ -251,8 +251,9 @@ export default {
     border-radius: 50%;
     background: #4F4F50;
     position: absolute;
-    top: -50%;
-    right: -50%;
+    top: -11px;
+    right: -11px;
+    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;

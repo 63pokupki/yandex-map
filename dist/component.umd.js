@@ -167,7 +167,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
     }, {
         key: 'fGetBalloonLayout',
         value: function fGetBalloonLayout() {
-            var myBalloonLayout = ymaps.templateLayoutFactory.createClass('<div class="ymap-pvz-popover">' + '<div class="ymap-pvz-popover-close">&times;</div>' + '<div class="ymap-pvz-popover-inner">' + '$[[options.contentLayout observeSize minWidth=235 maxWidth=235 maxHeight=350]]' + '</div>' + '<div class="ymap-pvz-popover-arrow"></div>' + '</div>', {
+            var myBalloonLayout = ymaps.templateLayoutFactory.createClass('<div class="ymap-pvz-popover">' + '<div class="ymap-pvz-popover-close">&times;</div>' + '<div class="ymap-pvz-popover-inner">' + '$[[options.contentLayout observeSize]]' + '</div>' + '<div class="ymap-pvz-popover-arrow"></div>' + '</div>', {
                 /**
                  * Строит экземпляр макета на основе шаблона и добавляет его в родительский HTML-элемент.
                  * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/layout.templateBased.Base.xml#build
@@ -175,16 +175,15 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @name build
                  */
                 build: function build() {
+                    console.log(123);
                     this.constructor.superclass.build.call(this);
 
-                    console.log('build');
                     this._$element = this.getParentElement().querySelector('.ymap-pvz-popover');
 
-                    console.log('build', this._$element);
                     this.applyElementOffset();
 
                     var elClose = this._$element.querySelector('.ymap-pvz-popover-close');
-                    elClose.addEventListener('click', this.onCloseClick);
+                    elClose.addEventListener('click', this.onCloseClick.bind(this));
                 },
 
                 /**
@@ -195,7 +194,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  */
                 clear: function clear() {
                     var elClose = this._$element.querySelector('.ymap-pvz-popover-close');
-                    elClose.removeEventListener('click', this.onCloseClick);
+                    elClose.removeEventListener('click', this.onCloseClick.bind(this));
 
                     this.constructor.superclass.clear.call(this);
                 },
@@ -225,8 +224,11 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @name applyElementOffset
                  */
                 applyElementOffset: function applyElementOffset() {
-                    this._$element.style.left = -(this._$element.offsetWidth / 2), this._$element.style.top = -(this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight);
-                    console.log(this._$element);
+                    var nLeft = -(this._$element.offsetWidth / 2);
+                    var nArrowHeight = 6;
+                    var nTop = -(this._$element.offsetHeight + nArrowHeight);
+                    this._$element.style.left = nLeft + 'px';
+                    this._$element.style.top = nTop + 'px';
                 },
 
                 /**
@@ -237,7 +239,6 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  */
                 onCloseClick: function onCloseClick(e) {
                     e.preventDefault();
-
                     this.events.fire('userclose');
                 },
 
@@ -263,7 +264,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @function
                  * @private
                  * @name _isElement
-                 * @param {jQuery} [element] Элемент.
+                 * @param {HTMLDivElement} [element] Элемент.
                  * @returns {Boolean} Флаг наличия.
                  */
                 _isElement: function _isElement(element) {
@@ -315,17 +316,18 @@ var YMapsObjects = exports.YMapsObjects = function () {
             var BalloonContentLayout = ymaps.templateLayoutFactory.createClass("<div>" + "<b>123</b>" + "</div>");
 
             for (var i = 0; i < this.markers.length; i++) {
+                var vMarker = this.markers[i];
                 var oneObject = {
                     type: 'Feature',
-                    id: this.markers[i].id,
+                    id: vMarker.id,
                     geometry: {
                         type: 'Point',
-                        coordinates: [this.markers[i].latitude, this.markers[i].longitude]
+                        coordinates: [vMarker.latitude, vMarker.longitude]
                     }
                 };
-                if (this.markers[i].iconImageHref) {
+                if (vMarker.iconImageHref) {
                     oneObject.options = {
-                        iconImageHref: this.markers[i].iconImageHref,
+                        iconImageHref: vMarker.iconImageHref,
                         balloonContentLayout: BalloonContentLayout,
                         balloonLayout: this.fGetBalloonLayout()
                     };
@@ -333,6 +335,15 @@ var YMapsObjects = exports.YMapsObjects = function () {
                         balloonPanelMaxMapArea: 0
                     };
                 }
+                // if (vMarker.balloonContent) {
+                // if (vMarker.iconImageHref) {
+                //     if (!oneObject.options) {
+                //         oneObject.options = {}
+                //     }
+                //     // oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html, vMarker.balloonContent.methods)
+                //     oneObject.options.balloonLayout = this.fGetBalloonLayout()
+                //     oneObject.options.balloonContentLayout = ymaps.templateLayoutFactory.createClass('<div>12312312312</div>')
+                // }
                 objectColection.push(oneObject);
             }
             objectManager.add(objectColection);
@@ -583,7 +594,7 @@ exports.default = {
     props: {
         /**
          * список кластеров
-         * @type {Array.<{id:number, latitude:string, longitude: string, iconImageHref: string}>} 
+         * @type {Array.<{id:number, latitude:string, longitude: string, iconImageHref: string, balloonContent: {html: string, methods: object}}>} 
          */
         markers: {
             type: Array,
@@ -1246,7 +1257,7 @@ function normalizeComponent (
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _YandexMap_vue_vue_type_template_id_3ba07e74___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("7f65");
+/* harmony import */ var _YandexMap_vue_vue_type_template_id_065ae14b___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("3ba1");
 /* harmony import */ var _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("3d5c");
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _YandexMap_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("5469");
@@ -1261,8 +1272,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(
   _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _YandexMap_vue_vue_type_template_id_3ba07e74___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
-  _YandexMap_vue_vue_type_template_id_3ba07e74___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
+  _YandexMap_vue_vue_type_template_id_065ae14b___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
+  _YandexMap_vue_vue_type_template_id_065ae14b___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
   false,
   null,
   null,
@@ -1271,6 +1282,25 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 )
 
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "3ba1":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
+__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=065ae14b&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=065ae14b&
+
 
 /***/ }),
 
@@ -1527,7 +1557,7 @@ function applyToTag (styleElement, obj) {
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__("24fb");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, ".ymap-pvz-popover{background:#fff;border-radius:8px;position:relative;box-shadow:0 0 8px rgba(0,0,0,.15);width:-webkit-fit-content;width:-moz-fit-content;width:fit-content}.ymap-pvz-popover-close{width:22px;height:22px;border-radius:50%;background:#4f4f50;position:absolute;top:-50%;right:-50%;display:flex;justify-content:center;align-items:center;color:#fff}.ymap-pvz-popover-arrow{display:block;width:6px;height:6px;position:absolute;left:calc(50% - 3px);bottom:-3px;background-color:inherit;transform:rotate(45deg);box-shadow:0 0 8px rgba(0,0,0,.15)}", ""]);
+exports.push([module.i, ".ymap-pvz-popover{background:#fff;border-radius:8px;position:relative;box-shadow:0 0 8px rgba(0,0,0,.15);width:-webkit-fit-content;width:-moz-fit-content;width:fit-content}.ymap-pvz-popover-close{width:22px;height:22px;border-radius:50%;background:#4f4f50;position:absolute;top:-11px;right:-11px;cursor:pointer;display:flex;justify-content:center;align-items:center;color:#fff}.ymap-pvz-popover-arrow{display:block;width:6px;height:6px;position:absolute;left:calc(50% - 3px);bottom:-3px;background-color:inherit;transform:rotate(45deg);box-shadow:0 0 8px rgba(0,0,0,.15)}", ""]);
 // Exports
 module.exports = exports;
 
@@ -1631,25 +1661,6 @@ var YMapsBase = exports.YMapsBase = function () {
 
 	return YMapsBase;
 }();
-
-/***/ }),
-
-/***/ "7f65":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
-__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=3ba07e74&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
-var staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=3ba07e74&
-
 
 /***/ }),
 
