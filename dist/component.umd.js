@@ -253,9 +253,12 @@ var YMapsObjects = exports.YMapsObjects = function () {
                         return myBalloonLayout.superclass.getShape.call(this);
                     }
 
-                    var position = this._$element.position();
+                    var nTop = Number(this._$element.style.top.substring(0, this._$element.style.top.length - 2));
+                    var nLeft = Number(this._$element.style.left.substring(0, this._$element.style.left.length - 2));
 
-                    return new ymaps.shape.Rectangle(new ymaps.geometry.pixel.Rectangle([[position.left, position.top], [position.left + this._$element.offsetWidth, position.top + this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight]]));
+                    console.log(this._$element.offsetWidth, nTop, nLeft);
+
+                    return new ymaps.shape.Rectangle(new ymaps.geometry.pixel.Rectangle([[nLeft, nTop], [nLeft + this._$element.offsetWidth, nTop + this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight]]));
                 },
 
                 /**
@@ -267,7 +270,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                  * @returns {Boolean} Флаг наличия.
                  */
                 _isElement: function _isElement(element) {
-                    return element && element[0] && element.querySelector('.ymap-pvz-popover-arrow');
+                    return element && element.querySelector('.ymap-pvz-popover-arrow');
                 }
             });
             return myBalloonLayout;
