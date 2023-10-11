@@ -215,7 +215,10 @@ export class YMapsObjects {
             if (vMarker.balloonContent) {
                 oneObject.options = {
                     balloonLayout: this.fGetBalloonLayout(),
-                    balloonContentLayout: ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html),
+                    balloonContentLayout: ymaps.templateLayoutFactory.createClass(
+                        vMarker.balloonContent.html, 
+                        vMarker.balloonContent.methods,
+                    ),
                     hideIconOnBalloonOpen: false,
                     balloonPanelMaxMapArea: 0,
                 }

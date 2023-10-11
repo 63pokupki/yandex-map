@@ -247,8 +247,6 @@ var YMapsObjects = exports.YMapsObjects = function () {
                     var nTop = Number(this._$element.style.top.substring(0, this._$element.style.top.length - 2));
                     var nLeft = Number(this._$element.style.left.substring(0, this._$element.style.left.length - 2));
 
-                    console.log(this._$element.offsetWidth, nTop, nLeft);
-
                     return new ymaps.shape.Rectangle(new ymaps.geometry.pixel.Rectangle([[nLeft, nTop], [nLeft + this._$element.offsetWidth, nTop + this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight]]));
                 },
 
@@ -319,7 +317,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 if (vMarker.balloonContent) {
                     oneObject.options = {
                         balloonLayout: this.fGetBalloonLayout(),
-                        balloonContentLayout: ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html),
+                        balloonContentLayout: ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html, vMarker.balloonContent.methods),
                         hideIconOnBalloonOpen: false,
                         balloonPanelMaxMapArea: 0
                     };
