@@ -13,6 +13,7 @@ export function fAddBaloonToMap(Cls, ctx) {
 		Map: ctx.Map, 
 		markers: ctx.markers,
 		pathToBaloon: ctx.pathToBaloon,
+		priorityClusterIcon: ctx.priorityClusterIcon,
 	});
 	return cls.fCreate();
 }

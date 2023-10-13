@@ -14,7 +14,10 @@ export default {
     props : {
         /**
          * список кластеров
-         * @type {Array.<{id:number, latitude:string, longitude: string, iconImageHref: string, balloonContent: {html: string, methods: object}}>} 
+         * @type {Array.<
+         * {id:number, latitude:string, longitude: string, iconImageHref: string, 
+         * balloonContent: {html: string, methods: object},
+         * }>} 
          */
          markers: {
             type: Array,
@@ -45,6 +48,9 @@ export default {
         },
         currentCoords: [],
         pathToBaloon: '',
+        priorityClusterIcon: {
+            type: String,
+        }
     },
 
     data() {
@@ -97,6 +103,7 @@ export default {
                 },
                 pathToBaloon: this.pathToBaloon,
                 putMarkerInSearch: this.putMarkerInSearch,
+                priorityClusterIcon: this.priorityClusterIcon,
             });
 
             const { map, map_objects, search_control, zoom_control } = await this.mapCustom.faInitMap();

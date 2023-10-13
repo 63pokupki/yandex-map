@@ -5,14 +5,17 @@ export class YMapsObjects {
     markers;
     /** Путь до изображения балуна */
     pathToBaloon;
+    /** Приоритетная иконка кластера */
+    priorityClusterIcon;
 
     /**
-     * @param {{Map: any, markers: Array, pathToBaloon: string}} params
+     * @param {{Map: any, markers: Array, pathToBaloon: string, priorityClusterIcon: string}} params
      */
     constructor(params) {
         this.markers = params.markers;
         this.pathToBaloon = params.pathToBaloon
         this.Map = params.Map;
+        this.priorityClusterIcon = params.priorityClusterIcon
     }
 
     /** Получить шаблок для отображение самой часто встречаемой иконки внутри кластера */
@@ -28,13 +31,17 @@ export class YMapsObjects {
                 let sIconMostFrequent = aFeatures[0].options.iconImageHref
                 for (let i = 0; i<aFeatures.length; i++) {
                     const sIcon = aFeatures[i].options.iconImageHref
+                    if (sIcon && sIcon === priorityClusterIcon) {
+                        sIconMostFrequent = sIcon
+                        break;
+                    }
                     if (ixFrequent[sIcon]) {
                         ixFrequent[sIcon]++
-                    } else {
-                        ixFrequent[sIcon] = 0
                         if (ixFrequent[sIcon] > ixFrequent[sIconMostFrequent]) {
                             sIconMostFrequent = sIcon
                         }
+                    } else {
+                        ixFrequent[sIcon] = 0
                     }
                 }
                 

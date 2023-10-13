@@ -22,6 +22,8 @@ export class YMapsCustom {
     MapControls;
     /** Путь до изображения балуна */
     pathToBaloon;
+    /** Приоритетная иконка кластера */
+    priorityClusterIcon;
 
     constructor(MapConfig) {
         this.mapId = MapConfig.mapId;
@@ -31,6 +33,7 @@ export class YMapsCustom {
         this.zoomOptions = MapConfig.zoomOptions;
         this.pathToBaloon = MapConfig.pathToBaloon;
         this.putMarkerInSearch = MapConfig.putMarkerInSearch;
+        this.priorityClusterIcon = MapConfig.priorityClusterIcon
     }
 
     fInitMapObjects() {
