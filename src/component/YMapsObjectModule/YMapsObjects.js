@@ -6,46 +6,45 @@ export class YMapsObjects {
     /** Путь до изображения балуна */
     pathToBaloon;
     /** Приоритетная иконка кластера */
-    priorityClusterIcon;
+    generateClusterIcon;
 
     /**
-     * @param {{Map: any, markers: Array, pathToBaloon: string, priorityClusterIcon: string}} params
+     * @param {{Map: any, markers: Array, pathToBaloon: string, generateClusterIcon: string}} params
      */
     constructor(params) {
         this.markers = params.markers;
         this.pathToBaloon = params.pathToBaloon
         this.Map = params.Map;
-        this.priorityClusterIcon = params.priorityClusterIcon
+        this.generateClusterIcon = params.generateClusterIcon
     }
 
     /** Получить шаблок для отображение самой часто встречаемой иконки внутри кластера */
-    fGetMostFrequentItemTemplate() {
+    fGetClusterIconLayout() {
         const mostFrequentIcon = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
             build: function () {
                 mostFrequentIcon.superclass.build.call(this);
 
-                const imgElement = this.getParentElement().querySelector('img')
+                const elImg = this.getParentElement().querySelector('img')
 
                 const aFeatures = this.getData().features
-                const ixFrequent = {}
-                let sIconMostFrequent = aFeatures[0].options.iconImageHref
-                for (let i = 0; i<aFeatures.length; i++) {
-                    const sIcon = aFeatures[i].options.iconImageHref
-                    if (sIcon && sIcon === priorityClusterIcon) {
-                        sIconMostFrequent = sIcon
-                        break;
-                    }
-                    if (ixFrequent[sIcon]) {
-                        ixFrequent[sIcon]++
-                        if (ixFrequent[sIcon] > ixFrequent[sIconMostFrequent]) {
-                            sIconMostFrequent = sIcon
-                        }
-                    } else {
-                        ixFrequent[sIcon] = 0
-                    }
+                if (this.generateClusterIcon) {
+                    this.generateClusterIcon({elImg, aFeatures})
                 }
-                
-                imgElement.src = sIconMostFrequent
+
+                // const ixFrequent = {}
+                // let sIconMostFrequent = aFeatures[0].options.iconImageHref
+                // for (let i = 0; i<aFeatures.length; i++) {
+                //     const sIcon = aFeatures[i].options.iconImageHref
+                //     if (ixFrequent[sIcon]) {
+                //         ixFrequent[sIcon]++
+                //         if (ixFrequent[sIcon] > ixFrequent[sIconMostFrequent]) {
+                //             sIconMostFrequent = sIcon
+                //         }
+                //     } else {
+                //         ixFrequent[sIcon] = 0
+                //     }
+                // }
+                // elImg.src = aFeatures[0].options.iconImageHref
 
 			},
         });
@@ -198,7 +197,7 @@ export class YMapsObjects {
             // её "ножки" (точки привязки).
             objectManagerConfig.clusterIconImageOffset = [-35, -70]
         } else {
-            objectManagerConfig.clusterIconLayout = this.fGetMostFrequentItemTemplate()
+            objectManagerConfig.clusterIconLayout = this.fGetClusterIconLayout()
             objectManagerConfig.clusterIconShape = {
                 type: 'Circle',
                 coordinates: [0, -25],

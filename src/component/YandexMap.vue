@@ -18,8 +18,8 @@ export default {
          * {id:number, latitude:string, longitude: string, iconImageHref: string, 
          * balloonContent: {html: string, methods: object},
          * }>} 
-         */
-         markers: {
+        */
+        markers: {
             type: Array,
             default: () => []
         },
@@ -48,8 +48,12 @@ export default {
         },
         currentCoords: [],
         pathToBaloon: '',
-        priorityClusterIcon: {
-            type: String,
+        /**
+         * Функция генерирующая иконку кластера
+         * @type {({elImg: HTMLImageElement, aFeatures: any}) => void} 
+        */
+        generateClusterIcon: {
+            type: Function,
         }
     },
 
@@ -103,7 +107,7 @@ export default {
                 },
                 pathToBaloon: this.pathToBaloon,
                 putMarkerInSearch: this.putMarkerInSearch,
-                priorityClusterIcon: this.priorityClusterIcon,
+                generateClusterIcon: this.generateClusterIcon,
             });
 
             const { map, map_objects, search_control, zoom_control } = await this.mapCustom.faInitMap();
