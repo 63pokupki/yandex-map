@@ -5,50 +5,14 @@ export class YMapsObjects {
     markers;
     /** Путь до изображения балуна */
     pathToBaloon;
-    /** Приоритетная иконка кластера */
-    generateClusterIcon;
 
     /**
-     * @param {{Map: any, markers: Array, pathToBaloon: string, generateClusterIcon: string}} params
+     * @param {{Map: any, markers: Array, pathToBaloon: string}} params
      */
     constructor(params) {
         this.markers = params.markers;
         this.pathToBaloon = params.pathToBaloon
         this.Map = params.Map;
-        this.generateClusterIcon = params.generateClusterIcon
-    }
-
-    /** Получить шаблок для отображение самой часто встречаемой иконки внутри кластера */
-    fGetClusterIconLayout() {
-        const mostFrequentIcon = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
-            build: function () {
-                mostFrequentIcon.superclass.build.call(this);
-
-                const elImg = this.getParentElement().querySelector('img')
-
-                const aFeatures = this.getData().features
-                if (this.generateClusterIcon) {
-                    this.generateClusterIcon({elImg, aFeatures})
-                }
-
-                // const ixFrequent = {}
-                // let sIconMostFrequent = aFeatures[0].options.iconImageHref
-                // for (let i = 0; i<aFeatures.length; i++) {
-                //     const sIcon = aFeatures[i].options.iconImageHref
-                //     if (ixFrequent[sIcon]) {
-                //         ixFrequent[sIcon]++
-                //         if (ixFrequent[sIcon] > ixFrequent[sIconMostFrequent]) {
-                //             sIconMostFrequent = sIcon
-                //         }
-                //     } else {
-                //         ixFrequent[sIcon] = 0
-                //     }
-                // }
-                // elImg.src = aFeatures[0].options.iconImageHref
-
-			},
-        });
-        return mostFrequentIcon
     }
 
     /** Получить шаблон балуна */
@@ -197,12 +161,11 @@ export class YMapsObjects {
             // её "ножки" (точки привязки).
             objectManagerConfig.clusterIconImageOffset = [-35, -70]
         } else {
-            objectManagerConfig.clusterIconLayout = this.fGetClusterIconLayout()
-            objectManagerConfig.clusterIconShape = {
-                type: 'Circle',
-                coordinates: [0, -25],
-                radius: 50,
-            }
+            objectManagerConfig.clusterIconLayout = 'default#pieChart'
+            objectManagerConfig.iconPieChartCoreRadius = 40
+            objectManagerConfig.iconPieChartRadius = 50
+            objectManagerConfig.iconPieChartDoughnut = false
+
         }
         const objectManager = new ymaps.ObjectManager(objectManagerConfig);
 
@@ -237,6 +200,7 @@ export class YMapsObjects {
                     oneObject.options = {}
                 }
                 oneObject.options.iconImageHref = vMarker.iconImageHref
+                oneObject.options.iconColor = vMarker.iconColor
             }
             objectColection.push(oneObject)
         }

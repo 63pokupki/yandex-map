@@ -15,7 +15,7 @@ export default {
         /**
          * список кластеров
          * @type {Array.<
-         * {id:number, latitude:string, longitude: string, iconImageHref: string, 
+         * {id:number, latitude:string, longitude: string, iconImageHref: string,  iconColor: string,
          * balloonContent: {html: string, methods: object},
          * }>} 
         */
@@ -48,13 +48,6 @@ export default {
         },
         currentCoords: [],
         pathToBaloon: '',
-        /**
-         * Функция генерирующая иконку кластера
-         * @type {({elImg: HTMLImageElement, aFeatures: any}) => void} 
-        */
-        generateClusterIcon: {
-            type: Function,
-        }
     },
 
     data() {
@@ -107,7 +100,6 @@ export default {
                 },
                 pathToBaloon: this.pathToBaloon,
                 putMarkerInSearch: this.putMarkerInSearch,
-                generateClusterIcon: this.generateClusterIcon,
             });
 
             const { map, map_objects, search_control, zoom_control } = await this.mapCustom.faInitMap();

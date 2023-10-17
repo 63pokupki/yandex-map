@@ -22,8 +22,6 @@ export class YMapsCustom {
     MapControls;
     /** Путь до изображения балуна */
     pathToBaloon;
-    /** Функция генерирующая иконку кластера */
-    generateClusterIcon;
 
     constructor(MapConfig) {
         this.mapId = MapConfig.mapId;
@@ -33,7 +31,6 @@ export class YMapsCustom {
         this.zoomOptions = MapConfig.zoomOptions;
         this.pathToBaloon = MapConfig.pathToBaloon;
         this.putMarkerInSearch = MapConfig.putMarkerInSearch;
-        this.generateClusterIcon = MapConfig.generateClusterIcon
     }
 
     fInitMapObjects() {

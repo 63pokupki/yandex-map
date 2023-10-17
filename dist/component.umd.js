@@ -113,66 +113,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var YMapsObjects = exports.YMapsObjects = function () {
 
     /**
-     * @param {{Map: any, markers: Array, pathToBaloon: string, generateClusterIcon: string}} params
+     * @param {{Map: any, markers: Array, pathToBaloon: string}} params
      */
 
-    /** Путь до изображения балуна */
-
-    /** Карта */
+    /** Маркеры */
     function YMapsObjects(params) {
         _classCallCheck(this, YMapsObjects);
 
         this.markers = params.markers;
         this.pathToBaloon = params.pathToBaloon;
         this.Map = params.Map;
-        this.generateClusterIcon = params.generateClusterIcon;
     }
 
-    /** Получить шаблок для отображение самой часто встречаемой иконки внутри кластера */
+    /** Получить шаблон балуна */
 
-    /** Приоритетная иконка кластера */
+    /** Путь до изображения балуна */
 
-    /** Маркеры */
+    /** Карта */
 
 
     _createClass(YMapsObjects, [{
-        key: 'fGetClusterIconLayout',
-        value: function fGetClusterIconLayout() {
-            var mostFrequentIcon = ymaps.templateLayoutFactory.createClass('<img width="70" height="70" style="position: absolute; left: -35px; top: -70px;">', {
-                build: function build() {
-                    mostFrequentIcon.superclass.build.call(this);
-
-                    var elImg = this.getParentElement().querySelector('img');
-
-                    var aFeatures = this.getData().features;
-                    console.log(this.generateClusterIcon);
-                    if (this.generateClusterIcon) {
-                        this.generateClusterIcon({ elImg: elImg, aFeatures: aFeatures });
-                    }
-
-                    // const ixFrequent = {}
-                    // let sIconMostFrequent = aFeatures[0].options.iconImageHref
-                    // for (let i = 0; i<aFeatures.length; i++) {
-                    //     const sIcon = aFeatures[i].options.iconImageHref
-                    //     if (ixFrequent[sIcon]) {
-                    //         ixFrequent[sIcon]++
-                    //         if (ixFrequent[sIcon] > ixFrequent[sIconMostFrequent]) {
-                    //             sIconMostFrequent = sIcon
-                    //         }
-                    //     } else {
-                    //         ixFrequent[sIcon] = 0
-                    //     }
-                    // }
-
-                    elImg.src = aFeatures[0].options.iconImageHref;
-                }
-            });
-            return mostFrequentIcon;
-        }
-
-        /** Получить шаблон балуна */
-
-    }, {
         key: 'fGetBalloonLayout',
         value: function fGetBalloonLayout() {
             var myBalloonLayout = ymaps.templateLayoutFactory.createClass('<div class="ymap-pvz-popover">' + '<div class="ymap-pvz-popover-close">&times;</div>' + '<div class="ymap-pvz-popover-inner">' + '$[[options.contentLayout observeSize]]' + '</div>' + '<div class="ymap-pvz-popover-arrow"></div>' + '</div>', {
@@ -310,12 +270,10 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 // её "ножки" (точки привязки).
                 objectManagerConfig.clusterIconImageOffset = [-35, -70];
             } else {
-                objectManagerConfig.clusterIconLayout = this.fGetClusterIconLayout();
-                objectManagerConfig.clusterIconShape = {
-                    type: 'Circle',
-                    coordinates: [0, -25],
-                    radius: 50
-                };
+                objectManagerConfig.clusterIconLayout = 'default#pieChart';
+                objectManagerConfig.iconPieChartCoreRadius = 40;
+                objectManagerConfig.iconPieChartRadius = 50;
+                objectManagerConfig.iconPieChartDoughnut = false;
             }
             var objectManager = new ymaps.ObjectManager(objectManagerConfig);
 
@@ -347,6 +305,7 @@ var YMapsObjects = exports.YMapsObjects = function () {
                         oneObject.options = {};
                     }
                     oneObject.options.iconImageHref = vMarker.iconImageHref;
+                    oneObject.options.iconColor = vMarker.iconColor;
                 }
                 objectColection.push(oneObject);
             }
@@ -599,7 +558,7 @@ exports.default = {
         /**
          * список кластеров
          * @type {Array.<
-         * {id:number, latitude:string, longitude: string, iconImageHref: string, 
+         * {id:number, latitude:string, longitude: string, iconImageHref: string,  iconColor: string,
          * balloonContent: {html: string, methods: object},
          * }>} 
         */
@@ -633,14 +592,7 @@ exports.default = {
             default: false
         },
         currentCoords: [],
-        pathToBaloon: '',
-        /**
-         * Функция генерирующая иконку кластера
-         * @type {({elImg: HTMLImageElement, aFeatures: any}) => void} 
-        */
-        generateClusterIcon: {
-            type: Function
-        }
+        pathToBaloon: ''
     },
 
     data: function data() {
@@ -702,8 +654,7 @@ exports.default = {
                                         maxZoom: 19
                                     },
                                     pathToBaloon: this.pathToBaloon,
-                                    putMarkerInSearch: this.putMarkerInSearch,
-                                    generateClusterIcon: this.generateClusterIcon
+                                    putMarkerInSearch: this.putMarkerInSearch
                                 });
 
                                 _context.next = 5;
@@ -1059,13 +1010,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 /** Модуль инициализации карты */
 var YMapsCustom = exports.YMapsCustom = function () {
-    /** Путь до изображения балуна */
+    /** Контроллеры карты */
 
-    /** Объект карты */
+    /** Начальные опции зума */
 
-    /** Маркеры на карте */
+    /** Элементы управления для отрисовки */
 
-    /** Координаты центра */
+    /** Id карты */
     function YMapsCustom(MapConfig) {
         _classCallCheck(this, YMapsCustom);
 
@@ -1076,17 +1027,14 @@ var YMapsCustom = exports.YMapsCustom = function () {
         this.zoomOptions = MapConfig.zoomOptions;
         this.pathToBaloon = MapConfig.pathToBaloon;
         this.putMarkerInSearch = MapConfig.putMarkerInSearch;
-        this.generateClusterIcon = MapConfig.generateClusterIcon;
     }
-    /** Функция генерирующая иконку кластера */
+    /** Путь до изображения балуна */
 
-    /** Контроллеры карты */
+    /** Объект карты */
 
-    /** Начальные опции зума */
+    /** Маркеры на карте */
 
-    /** Элементы управления для отрисовки */
-
-    /** Id карты */
+    /** Координаты центра */
 
 
     _createClass(YMapsCustom, [{
@@ -1270,31 +1218,12 @@ function normalizeComponent (
 
 /***/ }),
 
-/***/ "3566":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
-__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=3d56cef4&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
-var staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=3d56cef4&
-
-
-/***/ }),
-
 /***/ "3ac0":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _YandexMap_vue_vue_type_template_id_3d56cef4___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("3566");
+/* harmony import */ var _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("e3d7");
 /* harmony import */ var _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("3d5c");
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _YandexMap_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("5469");
@@ -1309,8 +1238,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(
   _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _YandexMap_vue_vue_type_template_id_3d56cef4___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
-  _YandexMap_vue_vue_type_template_id_3d56cef4___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
+  _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
+  _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
   false,
   null,
   null,
@@ -2757,8 +2686,7 @@ function fAddBaloonToMap(Cls, ctx) {
 	var cls = new Cls({
 		Map: ctx.Map,
 		markers: ctx.markers,
-		pathToBaloon: ctx.pathToBaloon,
-		generateClusterIcon: ctx.generateClusterIcon
+		pathToBaloon: ctx.pathToBaloon
 	});
 	return cls.fCreate();
 }
@@ -2846,6 +2774,25 @@ if (hadRuntime) {
 
 
 module.exports = __webpack_require__("bbdd");
+
+/***/ }),
+
+/***/ "e3d7":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
+__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=067e7bd8&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=067e7bd8&
+
 
 /***/ }),
 
