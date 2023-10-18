@@ -262,8 +262,8 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 objectManagerConfig.clusterIconImageOffset = [-35, -70];
             } else {
                 objectManagerConfig.clusterIconLayout = 'default#pieChart';
-                objectManagerConfig.clusterIconPieChartCoreRadius = 40;
-                objectManagerConfig.clusterIconPieChartRadius = 50;
+                objectManagerConfig.clusterIconPieChartRadius = 30;
+                objectManagerConfig.clusterIconPieChartCoreRadius = 25;
                 objectManagerConfig.clusterIconPieChartDoughnut = false;
             }
             var objectManager = new ymaps.ObjectManager(objectManagerConfig);
