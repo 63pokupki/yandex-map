@@ -2,23 +2,23 @@ import { YMapsBase } from "./YMapsCtrlBase";
 
 export class YMapsZoom extends YMapsBase {
     /** Шаблон элемента */
-    tpl = `<div class="range">
-                <button id="zoom-out" class="range-btn">
+    tpl = `<div class="ymaps-range">
+                <button id="zoom-out" class="ymaps-range-btn">
                     <svg width="23" height="5" viewBox="0 0 23 5" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="22.3064" y="0.63501" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 0.63501)" fill="#36A6F2"/>
                     </svg>    
                 </button>
-                <div class="range-line range-line__active"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <div class="range-line"></div>
-                <button id="zoom-in" class="range-btn">
+                <div class="ymaps-range-line ymaps-range-line__active"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <div class="ymaps-range-line"></div>
+                <button id="zoom-in" class="ymaps-range-btn">
                     <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="9.45898" y="0.790527" width="3.67068" height="22.1956" rx="1.83534" fill="#36A6F2"/>
                         <rect x="22.3064" y="10.0388" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 10.0388)" fill="#36A6F2"/>
