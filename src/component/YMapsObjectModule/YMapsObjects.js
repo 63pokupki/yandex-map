@@ -162,8 +162,8 @@ export class YMapsObjects {
             objectManagerConfig.clusterIconImageOffset = [-35, -70]
         } else {
             objectManagerConfig.clusterIconLayout = 'default#pieChart'
-            objectManagerConfig.clusterIconPieChartRadius = 30
-            objectManagerConfig.clusterIconPieChartCoreRadius = 25
+            objectManagerConfig.clusterIconPieChartRadius = 25
+            objectManagerConfig.clusterIconPieChartCoreRadius = 20
             objectManagerConfig.clusterIconPieChartDoughnut = false
 
         }

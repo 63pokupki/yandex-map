@@ -40,7 +40,7 @@ export class YMapsZoom extends YMapsBase {
                 СustomZoomLayout.superclass.build.call(this);
 
                 // Получаем элементы отображающие текущий зум
-                this.zoomBtnItem = document.querySelectorAll('.range-line');
+                this.zoomBtnItem = document.querySelectorAll('.ymaps-range-line');
 
                 // Привязываем функции-обработчики к контексту и сохраняем ссылки на них, чтобы потом отписаться от событий.
                 this.zoomInCb = ymaps.util.bind(this.zoomIn, this);
@@ -51,7 +51,7 @@ export class YMapsZoom extends YMapsBase {
                 // Начинаем слушать события макета.
                 document.querySelector('#zoom-in').addEventListener('click', this.zoomInCb);
                 document.querySelector('#zoom-out').addEventListener('click', this.zoomOutCb);
-                document.querySelector('.range').addEventListener('click', this.zoomByRangeLineClickCb);
+                document.querySelector('.ymaps-range').addEventListener('click', this.zoomByRangeLineClickCb);
                 map.events.add('wheel', this.setCustomZoomValueCb);
 
                 // Получаем и устанавливаем значение zoom
@@ -65,7 +65,7 @@ export class YMapsZoom extends YMapsBase {
                 // Снимаем обработчики.
                 const zoomIn =  document.querySelector('#zoom-in');
                 const zoomOut = document.querySelector('#zoom-out');
-                const range = document.querySelector('.range');
+                const range = document.querySelector('.ymaps-range');
 
                 if (zoomIn) {
                     zoomIn.removeEventListener('click', this.zoomInCb);
@@ -90,15 +90,15 @@ export class YMapsZoom extends YMapsBase {
             // Устанавливаем значение самодельного зума при клике по одной из полосок на нем
             zoomByRangeLineClick: function (e) {
                 const map = this.getData().map;
-                if (e.target.classList.contains('range-line')) {
+                if (e.target.classList.contains('ymaps-range-line')) {
                     for (let i = 0; i < this.zoomBtnItem.length; i++) {
-                        this.zoomBtnItem[i].classList.remove('range-line__active');
+                        this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                     }
-                    e.target.classList.add('range-line__active');
+                    e.target.classList.add('ymaps-range-line__active');
                     let indexOfActive = 0;
-                    const zoomBtnItemNew = document.querySelectorAll('.range-line');
+                    const zoomBtnItemNew = document.querySelectorAll('.ymaps-range-line');
                     for (let i = 0; i < zoomBtnItemNew.length; i++) {
-                        if (zoomBtnItemNew[i].classList.contains('range-line__active')) {
+                        if (zoomBtnItemNew[i].classList.contains('ymaps-range-line__active')) {
                             indexOfActive = i;
                         }
                     }
@@ -111,11 +111,11 @@ export class YMapsZoom extends YMapsBase {
 
                 const checkInterval = setInterval(() => {
                     const zoom = map.getZoom();
-                    this.zoomBtnItem[zoom - 10].classList.add('range-line__active');
+                    this.zoomBtnItem[zoom - 10].classList.add('ymaps-range-line__active');
                     for (let i = 0; i < this.zoomBtnItem.length; i++) {
-                        this.zoomBtnItem[i].classList.remove('range-line__active');
+                        this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                     }
-                    this.zoomBtnItem[zoom - 10].classList.add('range-line__active');
+                    this.zoomBtnItem[zoom - 10].classList.add('ymaps-range-line__active');
                 }, 10);
 
                 this.zoomScrollTimeout = setTimeout(() => {
@@ -130,14 +130,14 @@ export class YMapsZoom extends YMapsBase {
                 if (zoom < 19) {
                     map.setZoom(zoom + 1, this.zoomOptions);
                     for (let i = 0; i < this.zoomBtnItem.length; i++) {
-                        this.zoomBtnItem[i].classList.remove('range-line__active');
+                        this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                     }
 
                     const curr_zoom = map.getZoom();
 
-                    this.zoomBtnItem[(curr_zoom + 1) - 10].classList.add('range-line__active');
+                    this.zoomBtnItem[(curr_zoom + 1) - 10].classList.add('ymaps-range-line__active');
                 } else {
-                    this.zoomBtnItem[this.zoomBtnItem.length - 1].classList.add('range-line__active');
+                    this.zoomBtnItem[this.zoomBtnItem.length - 1].classList.add('ymaps-range-line__active');
                 }
             },
             // Отдалить
@@ -148,12 +148,12 @@ export class YMapsZoom extends YMapsBase {
                 if (zoom > 10) {
                     map.setZoom(zoom - 1, this.zoomOptions);
                     for (let i = 0; i < this.zoomBtnItem.length; i++) {
-                        this.zoomBtnItem[i].classList.remove('range-line__active');
+                        this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                     }
                     const curr_zoom = map.getZoom();
-                    this.zoomBtnItem[(curr_zoom - 1) - 10].classList.add('range-line__active');
+                    this.zoomBtnItem[(curr_zoom - 1) - 10].classList.add('ymaps-range-line__active');
                 } else {
-                    this.zoomBtnItem[0].classList.add('range-line__active');
+                    this.zoomBtnItem[0].classList.add('ymaps-range-line__active');
                 }
             }
         })

@@ -262,8 +262,8 @@ var YMapsObjects = exports.YMapsObjects = function () {
                 objectManagerConfig.clusterIconImageOffset = [-35, -70];
             } else {
                 objectManagerConfig.clusterIconLayout = 'default#pieChart';
-                objectManagerConfig.clusterIconPieChartRadius = 30;
-                objectManagerConfig.clusterIconPieChartCoreRadius = 25;
+                objectManagerConfig.clusterIconPieChartRadius = 25;
+                objectManagerConfig.clusterIconPieChartCoreRadius = 20;
                 objectManagerConfig.clusterIconPieChartDoughnut = false;
             }
             var objectManager = new ymaps.ObjectManager(objectManagerConfig);
@@ -346,7 +346,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
             args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsZoom.__proto__ || Object.getPrototypeOf(YMapsZoom)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="range">\n                <button id="zoom-out" class="range-btn">\n                    <svg width="23" height="5" viewBox="0 0 23 5" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="22.3064" y="0.63501" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 0.63501)" fill="#36A6F2"/>\n                    </svg>    \n                </button>\n                <div class="range-line range-line__active"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <button id="zoom-in" class="range-btn">\n                    <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="9.45898" y="0.790527" width="3.67068" height="22.1956" rx="1.83534" fill="#36A6F2"/>\n                        <rect x="22.3064" y="10.0388" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 10.0388)" fill="#36A6F2"/>\n                    </svg>                 \n                </button>\n            </div>', _temp), _possibleConstructorReturn(_this, _ret);
+        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsZoom.__proto__ || Object.getPrototypeOf(YMapsZoom)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="ymaps-range">\n                <button id="zoom-out" class="ymaps-range-btn">\n                    <svg width="23" height="5" viewBox="0 0 23 5" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="22.3064" y="0.63501" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 0.63501)" fill="#36A6F2"/>\n                    </svg>    \n                </button>\n                <div class="ymaps-range-line ymaps-range-line__active"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <button id="zoom-in" class="ymaps-range-btn">\n                    <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="9.45898" y="0.790527" width="3.67068" height="22.1956" rx="1.83534" fill="#36A6F2"/>\n                        <rect x="22.3064" y="10.0388" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 10.0388)" fill="#36A6F2"/>\n                    </svg>                 \n                </button>\n            </div>', _temp), _possibleConstructorReturn(_this, _ret);
     }
     /** Шаблон элемента */
 
@@ -369,7 +369,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     СustomZoomLayout.superclass.build.call(this);
 
                     // Получаем элементы отображающие текущий зум
-                    this.zoomBtnItem = document.querySelectorAll('.range-line');
+                    this.zoomBtnItem = document.querySelectorAll('.ymaps-range-line');
 
                     // Привязываем функции-обработчики к контексту и сохраняем ссылки на них, чтобы потом отписаться от событий.
                     this.zoomInCb = ymaps.util.bind(this.zoomIn, this);
@@ -380,7 +380,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     // Начинаем слушать события макета.
                     document.querySelector('#zoom-in').addEventListener('click', this.zoomInCb);
                     document.querySelector('#zoom-out').addEventListener('click', this.zoomOutCb);
-                    document.querySelector('.range').addEventListener('click', this.zoomByRangeLineClickCb);
+                    document.querySelector('.ymaps-range').addEventListener('click', this.zoomByRangeLineClickCb);
                     map.events.add('wheel', this.setCustomZoomValueCb);
 
                     // Получаем и устанавливаем значение zoom
@@ -394,7 +394,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     // Снимаем обработчики.
                     var zoomIn = document.querySelector('#zoom-in');
                     var zoomOut = document.querySelector('#zoom-out');
-                    var range = document.querySelector('.range');
+                    var range = document.querySelector('.ymaps-range');
 
                     if (zoomIn) {
                         zoomIn.removeEventListener('click', this.zoomInCb);
@@ -419,15 +419,15 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                 // Устанавливаем значение самодельного зума при клике по одной из полосок на нем
                 zoomByRangeLineClick: function zoomByRangeLineClick(e) {
                     var map = this.getData().map;
-                    if (e.target.classList.contains('range-line')) {
+                    if (e.target.classList.contains('ymaps-range-line')) {
                         for (var i = 0; i < this.zoomBtnItem.length; i++) {
-                            this.zoomBtnItem[i].classList.remove('range-line__active');
+                            this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
-                        e.target.classList.add('range-line__active');
+                        e.target.classList.add('ymaps-range-line__active');
                         var indexOfActive = 0;
-                        var zoomBtnItemNew = document.querySelectorAll('.range-line');
+                        var zoomBtnItemNew = document.querySelectorAll('.ymaps-range-line');
                         for (var _i = 0; _i < zoomBtnItemNew.length; _i++) {
-                            if (zoomBtnItemNew[_i].classList.contains('range-line__active')) {
+                            if (zoomBtnItemNew[_i].classList.contains('ymaps-range-line__active')) {
                                 indexOfActive = _i;
                             }
                         }
@@ -442,11 +442,11 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
 
                     var checkInterval = setInterval(function () {
                         var zoom = map.getZoom();
-                        _this2.zoomBtnItem[zoom - 10].classList.add('range-line__active');
+                        _this2.zoomBtnItem[zoom - 10].classList.add('ymaps-range-line__active');
                         for (var i = 0; i < _this2.zoomBtnItem.length; i++) {
-                            _this2.zoomBtnItem[i].classList.remove('range-line__active');
+                            _this2.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
-                        _this2.zoomBtnItem[zoom - 10].classList.add('range-line__active');
+                        _this2.zoomBtnItem[zoom - 10].classList.add('ymaps-range-line__active');
                     }, 10);
 
                     this.zoomScrollTimeout = setTimeout(function () {
@@ -461,14 +461,14 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     if (zoom < 19) {
                         map.setZoom(zoom + 1, this.zoomOptions);
                         for (var i = 0; i < this.zoomBtnItem.length; i++) {
-                            this.zoomBtnItem[i].classList.remove('range-line__active');
+                            this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
 
                         var curr_zoom = map.getZoom();
 
-                        this.zoomBtnItem[curr_zoom + 1 - 10].classList.add('range-line__active');
+                        this.zoomBtnItem[curr_zoom + 1 - 10].classList.add('ymaps-range-line__active');
                     } else {
-                        this.zoomBtnItem[this.zoomBtnItem.length - 1].classList.add('range-line__active');
+                        this.zoomBtnItem[this.zoomBtnItem.length - 1].classList.add('ymaps-range-line__active');
                     }
                 },
                 // Отдалить
@@ -479,12 +479,12 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     if (zoom > 10) {
                         map.setZoom(zoom - 1, this.zoomOptions);
                         for (var i = 0; i < this.zoomBtnItem.length; i++) {
-                            this.zoomBtnItem[i].classList.remove('range-line__active');
+                            this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
                         var curr_zoom = map.getZoom();
-                        this.zoomBtnItem[curr_zoom - 1 - 10].classList.add('range-line__active');
+                        this.zoomBtnItem[curr_zoom - 1 - 10].classList.add('ymaps-range-line__active');
                     } else {
-                        this.zoomBtnItem[0].classList.add('range-line__active');
+                        this.zoomBtnItem[0].classList.add('ymaps-range-line__active');
                     }
                 }
             });
@@ -633,6 +633,7 @@ exports.default = {
                                     markers = [].concat(_toConsumableArray(this.markers));
                                 }
 
+                                console.log('init');
                                 // Создаём объект карты
                                 this.mapCustom = new _YandexMap.YMapsCustom({
                                     mapId: this.mapId,
@@ -648,10 +649,10 @@ exports.default = {
                                     putMarkerInSearch: this.putMarkerInSearch
                                 });
 
-                                _context.next = 5;
+                                _context.next = 6;
                                 return this.mapCustom.faInitMap();
 
-                            case 5:
+                            case 6:
                                 _ref2 = _context.sent;
                                 map = _ref2.map;
                                 map_objects = _ref2.map_objects;
@@ -689,7 +690,7 @@ exports.default = {
                                 this.map.events.add(['boundschange', 'datachange', 'objecttypeschange'], this.getVisibleObjects.bind(this));
                                 this.$emit("InitializeYandexMap", this.map);
 
-                            case 17:
+                            case 18:
                             case 'end':
                                 return _context.stop();
                         }
@@ -764,6 +765,7 @@ exports.default = {
     },
     watch: {
         coordsCenter: function coordsCenter() {
+            console.log('wath ymap coordsCenter', this.coordsCenter);
             if (this.coordsCenter && this.map) {
                 this.map.setCenter(this.coordsCenter);
             }
@@ -1214,7 +1216,7 @@ function normalizeComponent (
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("e3d7");
+/* harmony import */ var _YandexMap_vue_vue_type_template_id_6e9299d6___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("981e");
 /* harmony import */ var _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("3d5c");
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
 /* harmony import */ var _YandexMap_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("5469");
@@ -1229,8 +1231,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(
   _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
-  _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
+  _YandexMap_vue_vue_type_template_id_6e9299d6___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
+  _YandexMap_vue_vue_type_template_id_6e9299d6___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
   false,
   null,
   null,
@@ -1637,7 +1639,7 @@ var YMapsSearch = exports.YMapsSearch = function (_YMapsBase) {
 			args[_key] = arguments[_key];
 		}
 
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsSearch.__proto__ || Object.getPrototypeOf(YMapsSearch)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="input-wrapper">\n\t\t\t\t<input placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0430\u0434\u0440\u0435\u0441" id="suggest" class="yamaps-search__input" type="text">\n\t\t\t\t<button id="search_btn" class="yamaps-search__button">\u041D\u0430\u0439\u0442\u0438</button>\n\t\t\t</div>', _temp), _possibleConstructorReturn(_this, _ret);
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsSearch.__proto__ || Object.getPrototypeOf(YMapsSearch)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="ymaps-input-wrapper">\n\t\t\t\t<input placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0430\u0434\u0440\u0435\u0441" id="suggest" class="yamaps-search__input" type="text">\n\t\t\t\t<button id="search_btn" class="yamaps-search__button">\u041D\u0430\u0439\u0442\u0438</button>\n\t\t\t</div>', _temp), _possibleConstructorReturn(_this, _ret);
 	}
 	/** Шаблон элемента */
 
@@ -1873,7 +1875,7 @@ var YMapsStyles = exports.YMapsStyles = function (_YMapsBase) {
 			args[_key] = arguments[_key];
 		}
 
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsStyles.__proto__ || Object.getPrototypeOf(YMapsStyles)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = "<style>\n            \t.range {\n            \t    width: 40px;\n            \t    height: 225px;\n            \t    padding: 5px;\n            \t    box-sizing: border-box;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: space-between;\n            \t    background: rgba(218,218,218,0.49);\n            \t    border-radius: 9px;\n            \t    cursor: pointer;\n            \t    position: absolute;\n            \t    right: 15px;\n            \t    top: 275px;\n            \t}\n            \t.range-btn  {\n            \t    width: 30px;\n            \t    height: 30px;\n            \t    padding: 2px;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: center;\n            \t    align-items: center;\n            \t    box-sizing: border-box;\n            \t    border: none;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 4px;\n            \t    cursor: pointer;\n            \t}\n            \t.range-icon {\n            \t    width: 100%;\n            \t    background-color: blue;\n            \t    border-radius: 10550px;\n            \t}\n            \t.range-plus__horizontal {\n            \t    transform: rotate(45deg);\n            \t    top: -50%;\n            \t}\n            \t.range-line {\n            \t    width: 30px;\n            \t    height: 3px;\n            \t    background: #F9F9F9;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 3px;\n            \t}\n            \t.range-line.range-line__active {\n            \t    width: 29.79px;\n            \t    height: 8.58px;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 4.28846px #979797;\n            \t    border-radius: 3px;\n            \t}\n            \t.input-wrapper {\n\t\t\t\t\tposition: absolute;\n\t\t\t\t\ttop: 10px;\n\t\t\t\t\tleft: 10px;\n\t\t\t\t\tborder: 1px solid transparent;\n\t\t\t\t\twidth: 320px;\n\t\t\t\t\theight: 36px;\n\t\t\t\t\tbackground: #FFFFFF;\n\t\t\t\t\tborder-radius: 35px;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: stretch;\n\t\t\t\t\tjustify-content: space-between;\n\t\t\t\t\tbackground-color: transparent;\n\t\t\t\t\tfilter: drop-shadow(0px 1px 8px rgba(96, 98, 102, 0.3));\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input {\n\t\t\t\t\twidth: 64%;\n\t\t\t\t\tborder-top-left-radius: 35px;\n\t\t\t\t\tborder-bottom-left-radius: 35px;\n\t\t\t\t\theight: 100%;\n\t\t\t\t\tpadding-left: 12px;\n\t\t\t\t\tborder: none;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input::placeholder {\n\t\t\t\t\tfont-weight: 400;\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tline-height: 14px;\n\t\t\t\t\tcolor: #606266;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input:focus {\n\t\t\t\t\toutline: none;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__button {\n\t\t\t\t\twidth: 40%;\n\t\t\t\t\tbackground-color: #FFE485;\n\t\t\t\t\theight: 35px;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t\tborder-top-right-radius: 35px;\n\t\t\t\t\tborder-bottom-right-radius: 35px;\n\t\t\t\t\tfont-family: 'Open Sans';\n\t\t\t\t\tfont-style: normal;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t\tfont-size: 12px;\n\t\t\t\t\tline-height: 16px;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tcolor: #1D1E1F;\n\t\t\t\t}\n\t\t\t\t.ymaps-2-1-79-copyright__content,\n            \t.ymaps-2-1-79-gototech,\n            \t.ymaps-2-1-79-gotoymaps__container,\n\t\t\t\t.ymaps-2-1-79-float-button,\n\t\t\t\t.ymaps-2-1-79-_hidden-icon,\n\t\t\t\t.ymaps-2-1-79-gototaxi,\n\t\t\t\t.ymaps-2-1-79-searchbox__normal-layout {\n            \t    display: none;\n            \t}\n\t\t\t\t@media screen and ( max-width: 550px) {\n\t\t\t\t\t.range {\n\t\t\t\t\t\ttop: 150px;\n\t\t\t\t\t}\n\t\t\t\t}\n            </style>", _temp), _possibleConstructorReturn(_this, _ret);
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsStyles.__proto__ || Object.getPrototypeOf(YMapsStyles)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = "<style>\n            \t.ymaps-range {\n            \t    width: 40px;\n            \t    height: 225px;\n            \t    padding: 5px;\n            \t    box-sizing: border-box;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: space-between;\n            \t    background: rgba(218,218,218,0.49);\n            \t    border-radius: 9px;\n            \t    cursor: pointer;\n            \t    position: absolute;\n            \t    right: 15px;\n            \t    top: 275px;\n            \t}\n            \t.ymaps-range-btn  {\n            \t    width: 30px;\n            \t    height: 30px;\n            \t    padding: 2px;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: center;\n            \t    align-items: center;\n            \t    box-sizing: border-box;\n            \t    border: none;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 4px;\n            \t    cursor: pointer;\n            \t}\n            \t.ymaps-range-line {\n            \t    width: 30px;\n            \t    height: 3px;\n            \t    background: #F9F9F9;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 3px;\n            \t}\n            \t.ymaps-range-line.ymaps-range-line__active {\n            \t    width: 29.79px;\n            \t    height: 8.58px;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 4.28846px #979797;\n            \t    border-radius: 3px;\n            \t}\n            \t.ymaps-input-wrapper {\n\t\t\t\t\tposition: absolute;\n\t\t\t\t\ttop: 10px;\n\t\t\t\t\tleft: 10px;\n\t\t\t\t\tborder: 1px solid transparent;\n\t\t\t\t\twidth: 320px;\n\t\t\t\t\theight: 36px;\n\t\t\t\t\tbackground: #FFFFFF;\n\t\t\t\t\tborder-radius: 35px;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: stretch;\n\t\t\t\t\tjustify-content: space-between;\n\t\t\t\t\tbackground-color: transparent;\n\t\t\t\t\tfilter: drop-shadow(0px 1px 8px rgba(96, 98, 102, 0.3));\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input {\n\t\t\t\t\twidth: 64%;\n\t\t\t\t\tborder-top-left-radius: 35px;\n\t\t\t\t\tborder-bottom-left-radius: 35px;\n\t\t\t\t\theight: 100%;\n\t\t\t\t\tpadding-left: 12px;\n\t\t\t\t\tborder: none;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input::placeholder {\n\t\t\t\t\tfont-weight: 400;\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tline-height: 14px;\n\t\t\t\t\tcolor: #606266;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input:focus {\n\t\t\t\t\toutline: none;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__button {\n\t\t\t\t\twidth: 40%;\n\t\t\t\t\tbackground-color: #FFE485;\n\t\t\t\t\theight: 35px;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t\tborder-top-right-radius: 35px;\n\t\t\t\t\tborder-bottom-right-radius: 35px;\n\t\t\t\t\tfont-family: 'Open Sans';\n\t\t\t\t\tfont-style: normal;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t\tfont-size: 12px;\n\t\t\t\t\tline-height: 16px;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tcolor: #1D1E1F;\n\t\t\t\t}\n\t\t\t\t.ymaps-2-1-79-copyright__content,\n            \t.ymaps-2-1-79-gototech,\n            \t.ymaps-2-1-79-gotoymaps__container,\n\t\t\t\t.ymaps-2-1-79-float-button,\n\t\t\t\t.ymaps-2-1-79-_hidden-icon,\n\t\t\t\t.ymaps-2-1-79-gototaxi,\n\t\t\t\t.ymaps-2-1-79-searchbox__normal-layout {\n            \t    display: none;\n            \t}\n\t\t\t\t@media screen and ( max-width: 550px) {\n\t\t\t\t\t.range {\n\t\t\t\t\t\ttop: 150px;\n\t\t\t\t\t}\n\t\t\t\t}\n            </style>", _temp), _possibleConstructorReturn(_this, _ret);
 	}
 	/** Шаблон элемента */
 
@@ -2611,6 +2613,25 @@ function () {
 
 /***/ }),
 
+/***/ "981e":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
+__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=6e9299d6&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=6e9299d6&
+
+
+/***/ }),
+
 /***/ "9bbc":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2765,25 +2786,6 @@ if (hadRuntime) {
 
 
 module.exports = __webpack_require__("bbdd");
-
-/***/ }),
-
-/***/ "e3d7":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
-__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=067e7bd8&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
-var staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=067e7bd8&
-
 
 /***/ }),
 
