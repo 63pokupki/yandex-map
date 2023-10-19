@@ -12,9 +12,23 @@ import { YMapsCustom } from './YandexMap';
 export default {
     name: 'YandexMap',
     props : {
+        /**
+         * список кластеров
+         * @type {Array.<
+         * {id:number, latitude:string, longitude: string, iconImageHref: string,  iconColor: string,
+         * balloonContent: {html: string, methods: object},
+         * }>} 
+        */
         markers: {
             type: Array,
-            default: null
+            default: () => []
+        },
+        /**
+         * Ставить ли маркер по клику
+         */
+        isMarkerOnClick: {
+            type: Boolean,
+            default: false,
         },
         coordsCenter: {
             type: Array,
@@ -38,12 +52,15 @@ export default {
 
     data() {
         return {
+            mapCustom: null,
             map: null,
             coords: [],
             objectManager: null,
             point: null,
             oneMarker: null,
             searchControl: null,
+            searchManager: null,
+            zoomManager: null,
             mapId: `yandex-map-${Math.round(Math.random() * 1000)}`
         };
     },
@@ -71,7 +88,7 @@ export default {
             }
 
             // Создаём объект карты
-            const Map = new YMapsCustom({ 
+            this.mapCustom = new YMapsCustom({ 
                 mapId: this.mapId,
                 center: this.coordsCenter,
                 controls: [],
@@ -85,12 +102,14 @@ export default {
                 putMarkerInSearch: this.putMarkerInSearch,
             });
 
-            const { map, map_objects, search_control, zoom_control } = await Map.faInitMap();
+            const { map, map_objects, search_control, zoom_control } = await this.mapCustom.faInitMap();
 
             this.map = map;
             this.objectManager = map_objects;
+            this.searchManager = search_control
+            this.zoomManager = zoom_control
 
-            if(!this.markers){
+            if(!this.markers || this.isMarkerOnClick){
                 this.map.events.add('click', this.onClickMap);
                 this.searchControl = new ymaps.control.SearchControl({
                     options: {
@@ -109,10 +128,11 @@ export default {
                 this.map.controls.add(this.searchControl);
                 this.searchControl.events.add('resultselect', this.Search);
             } 
-            else  this.setMarkers();
+            else {
+                this.objectManager.objects.events.add(['click'], this.onClickEvent);
+            }
 
             this.map.events.add(['boundschange','datachange','objecttypeschange'], this.getVisibleObjects.bind(this));
-
             this.$emit("InitializeYandexMap", this.map);           
         },
 
@@ -126,11 +146,6 @@ export default {
             }
 
             this.$emit("getVisibleObjects", aVisibleCoords);   
-        },
-        
-        // Установка маркеров на карте
-        setMarkers() {
-            this.objectManager.objects.events.add(['click'], this.onClickEvent);
         },
 
         // Событие клика на маркер
@@ -147,7 +162,9 @@ export default {
         // Событие клика по карте
         onClickMap(e) {
             let coords = e.get('coords');
-            this.map.geoObjects.removeAll();
+            if (this.oneMarker) {
+                this.map.geoObjects.remove(this.oneMarker);
+            }
             this.oneMarker = new ymaps.Placemark(coords);
             this.map.geoObjects.add( this.oneMarker);
             this.$emit("ClickMap", coords);
@@ -177,39 +194,40 @@ export default {
         coordsCenter: function() {
             if (this.coordsCenter && this.map) {
                 this.map.setCenter(this.coordsCenter);
-                this.setMarkers();
             }
         },
         markers: {
             async handler() {
-                this.objectManager.removeAll();
-                const objectColection = [];
-
-                for (let i = 0; i < this.markers.length; i++) {
-                    objectColection.push({
-                        type: 'Feature',
-                        id: this.markers[i].id,
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [this.markers[i].latitude, this.markers[i].longitude]
-                        },
-                    })
+                if (this.mapCustom) {
+                    this.mapCustom.markers = this.markers
+                    this.objectManager = this.mapCustom.fInitMapObjects()
+                    this.objectManager.objects.events.add(['click'], this.onClickEvent);
                 }
-
-                this.objectManager.add(objectColection);
             }
         },
         currentCoords: {
-        deep: true,
-        handler(currVal, oldVal) {
-            if (currVal && this.map) {
-                 this.map.setCenter(currVal);
-                 this.map.setZoom(18, { checkZoomRange: true, smooth: true, duration: 300 },)
-                 setTimeout(() => {
-                     document.querySelector('#zoom-in').click();
-                 }, 300)
+            deep: true,
+            handler(currVal, oldVal) {
+                if (currVal && this.map) {
+                    this.map.setCenter(currVal);
+                    this.map.setZoom(18, { checkZoomRange: true, smooth: true, duration: 300 },)
+                    setTimeout(() => {
+                        document.querySelector('#zoom-in').click();
+                    }, 300)
+                }
             }
-          }
+        },
+        isMarkerOnClick: (newValue) => {
+            if (newValue) {
+                this.map.events.add('click', this.onClickMap);
+                if(this.oneMarkerCoords) {
+                    this.oneMarker = new ymaps.Placemark(this.oneMarkerCoords);
+                    this.map.geoObjects.add(this.oneMarker);
+                }
+            } else {
+                this.map.events.remove('click', this.onClickMap);
+                this.map.geoObjects.remove(this.oneMarker);
+            }
         }
     },
     beforeDestroy() {
@@ -220,3 +238,42 @@ export default {
 }
 
 </script>
+
+
+<style>
+.ymap-pvz-popover {
+    background: white;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 0 8px rgba(0,0,0,.15);
+    width: fit-content;
+}
+.ymap-pvz-popover-close {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #4F4F50;
+    position: absolute;
+    top: -11px;
+    right: -11px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+.ymap-pvz-popover-arrow {
+    display: block;
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    left: calc(50% - 3px);
+    bottom: -3px;
+    background-color: inherit;
+    transform: rotate(45deg);
+    box-shadow: 0 0 8px rgba(0,0,0,.15);
+}
+.ymap-pvz-popover-inner {
+    
+}
+</style>

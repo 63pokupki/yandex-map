@@ -2,7 +2,7 @@ import { YMapsBase } from "./YMapsCtrlBase";
 
 export class YMapsSearch extends YMapsBase {
 	/** Шаблон элемента */
-	tpl = `<div class="input-wrapper">
+	tpl = `<div class="ymaps-input-wrapper">
 				<input placeholder="Введите адрес" id="suggest" class="yamaps-search__input" type="text">
 				<button id="search_btn" class="yamaps-search__button">Найти</button>
 			</div>`;

@@ -111,63 +111,207 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var YMapsObjects = exports.YMapsObjects = function () {
-    /** Карта */
-    function YMapsObjects(map, markers) {
-        _classCallCheck(this, YMapsObjects);
 
-        this.markers = markers;
-        this.Map = map;
-    }
-
-    /** Создаем объект контрола, с помощью templateLayoutFactory */
-
+    /**
+     * @param {{Map: any, markers: Array, pathToBaloon: string}} params
+     */
 
     /** Маркеры */
+    function YMapsObjects(params) {
+        _classCallCheck(this, YMapsObjects);
+
+        this.markers = params.markers;
+        this.pathToBaloon = params.pathToBaloon;
+        this.Map = params.Map;
+    }
+
+    /** Получить шаблон балуна */
+
+    /** Путь до изображения балуна */
+
+    /** Карта */
 
 
     _createClass(YMapsObjects, [{
+        key: 'fGetBalloonLayout',
+        value: function fGetBalloonLayout() {
+            var myBalloonLayout = ymaps.templateLayoutFactory.createClass('<div class="ymap-pvz-popover">' + '<div class="ymap-pvz-popover-close">&times;</div>' + '<div class="ymap-pvz-popover-inner">' + '$[[options.contentLayout observeSize]]' + '</div>' + '<div class="ymap-pvz-popover-arrow"></div>' + '</div>', {
+                /**
+                 * Строит экземпляр макета на основе шаблона и добавляет его в родительский HTML-элемент.
+                 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/layout.templateBased.Base.xml#build
+                 * @function
+                 * @name build
+                 */
+                build: function build() {
+                    this.constructor.superclass.build.call(this);
+
+                    this._$element = this.getParentElement().querySelector('.ymap-pvz-popover');
+
+                    this.applyElementOffset();
+
+                    var elClose = this._$element.querySelector('.ymap-pvz-popover-close');
+                    elClose.addEventListener('click', this.onCloseClick.bind(this));
+                },
+
+                /**
+                 * Удаляет содержимое макета из DOM.
+                 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/layout.templateBased.Base.xml#clear
+                 * @function
+                 * @name clear
+                 */
+                clear: function clear() {
+                    var elClose = this._$element.querySelector('.ymap-pvz-popover-close');
+                    elClose.removeEventListener('click', this.onCloseClick.bind(this));
+
+                    this.constructor.superclass.clear.call(this);
+                },
+
+                /**
+                 * Метод будет вызван системой шаблонов АПИ при изменении размеров вложенного макета.
+                 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/IBalloonLayout.xml#event-userclose
+                 * @function
+                 * @name onSublayoutSizeChange
+                 */
+                onSublayoutSizeChange: function onSublayoutSizeChange() {
+                    myBalloonLayout.superclass.onSublayoutSizeChange.apply(this, arguments);
+
+                    if (!this._isElement(this._$element)) {
+                        return;
+                    }
+
+                    this.applyElementOffset();
+
+                    this.events.fire('shapechange');
+                },
+
+                /**
+                 * Сдвигаем балун, чтобы "хвостик" указывал на точку привязки.
+                 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/IBalloonLayout.xml#event-userclose
+                 * @function
+                 * @name applyElementOffset
+                 */
+                applyElementOffset: function applyElementOffset() {
+                    var nLeft = -(this._$element.offsetWidth / 2);
+                    var nArrowHeight = 6;
+                    var nTop = -(this._$element.offsetHeight + nArrowHeight + 52);
+                    this._$element.style.left = nLeft + 'px';
+                    this._$element.style.top = nTop + 'px';
+                },
+
+                /**
+                 * Закрывает балун при клике на крестик, кидая событие "userclose" на макете.
+                 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/IBalloonLayout.xml#event-userclose
+                 * @function
+                 * @name onCloseClick
+                 */
+                onCloseClick: function onCloseClick(e) {
+                    e.preventDefault();
+                    this.events.fire('userclose');
+                },
+
+                /**
+                 * Используется для автопозиционирования (balloonAutoPan).
+                 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/ILayout.xml#getClientBounds
+                 * @function
+                 * @name getClientBounds
+                 * @returns {Number[][]} Координаты левого верхнего и правого нижнего углов шаблона относительно точки привязки.
+                 */
+                getShape: function getShape() {
+                    if (!this._isElement(this._$element)) {
+                        return myBalloonLayout.superclass.getShape.call(this);
+                    }
+
+                    var nTop = Number(this._$element.style.top.substring(0, this._$element.style.top.length - 2));
+                    var nLeft = Number(this._$element.style.left.substring(0, this._$element.style.left.length - 2));
+
+                    return new ymaps.shape.Rectangle(new ymaps.geometry.pixel.Rectangle([[nLeft, nTop], [nLeft + this._$element.offsetWidth, nTop + this._$element.offsetHeight + this._$element.querySelector('.ymap-pvz-popover-arrow').offsetHeight]]));
+                },
+
+                /**
+                 * Проверяем наличие элемента (в ИЕ и Опере его еще может не быть).
+                 * @function
+                 * @private
+                 * @name _isElement
+                 * @param {HTMLDivElement} [element] Элемент.
+                 * @returns {Boolean} Флаг наличия.
+                 */
+                _isElement: function _isElement(element) {
+                    return element && element.querySelector('.ymap-pvz-popover-arrow');
+                }
+            });
+            return myBalloonLayout;
+        }
+
+        /** Создаем объект контрола, с помощью templateLayoutFactory */
+
+    }, {
         key: 'fCreate',
-        value: function fCreate(pathToBaloon) {
+        value: function fCreate() {
             this.Map.geoObjects.removeAll();
-            this.objectManager = new ymaps.ObjectManager({
+
+            var objectManagerConfig = {
                 // Чтобы метки начали кластеризоваться, выставляем опцию.
                 clusterize: true,
                 // Опции для кастомной иконки одиночной метки
                 geoObjectIconLayout: 'default#image',
-                // Своё изображение иконки метки.
-                geoObjectIconImageHref: pathToBaloon,
                 // Размеры метки.
                 geoObjectIconImageSize: [50, 50],
                 // Смещение левого верхнего угла иконки относительно её "ножки" (точки привязки).
-                geoObjectIconImageOffset: [-25, -50],
-                // Опции для кастомной иконки кластера
-                clusterIconLayout: 'default#image',
+                geoObjectIconImageOffset: [-25, -50]
+            };
+            if (this.pathToBaloon) {
                 // Своё изображение иконки метки.
-                clusterIconImageHref: pathToBaloon,
+                objectManagerConfig.clusterIconImageHref = this.pathToBaloon;
+                // Опции для кастомной иконки кластера
+                objectManagerConfig.clusterIconLayout = 'default#image';
                 // Размеры метки.
-                clusterIconImageSize: [70, 70],
+                objectManagerConfig.clusterIconImageSize = [70, 70];
                 // Смещение левого верхнего угла иконки относительно
                 // её "ножки" (точки привязки).
-                clusterIconImageOffset: [-35, -70]
-            });
+                objectManagerConfig.clusterIconImageOffset = [-35, -70];
+            } else {
+                objectManagerConfig.clusterIconLayout = 'default#pieChart';
+                objectManagerConfig.clusterIconPieChartRadius = 25;
+                objectManagerConfig.clusterIconPieChartCoreRadius = 20;
+                objectManagerConfig.clusterIconPieChartDoughnut = false;
+            }
+            var objectManager = new ymaps.ObjectManager(objectManagerConfig);
 
             var objectColection = [];
 
             for (var i = 0; i < this.markers.length; i++) {
-                objectColection.push({
+                var vMarker = this.markers[i];
+                var oneObject = {
                     type: 'Feature',
-                    id: this.markers[i].id,
+                    id: vMarker.id,
                     geometry: {
                         type: 'Point',
-                        coordinates: [this.markers[i].latitude, this.markers[i].longitude]
+                        coordinates: [vMarker.latitude, vMarker.longitude]
                     }
-                });
+                };
+                if (vMarker.balloonContent) {
+                    oneObject.options = {
+                        balloonLayout: this.fGetBalloonLayout(),
+                        balloonContentLayout: ymaps.templateLayoutFactory.createClass(vMarker.balloonContent.html, vMarker.balloonContent.methods),
+                        hideIconOnBalloonOpen: false,
+                        balloonPanelMaxMapArea: 0
+                    };
+                    oneObject.properties = {
+                        balloonPanelMaxMapArea: 0
+                    };
+                }
+                if (vMarker.iconImageHref) {
+                    if (!oneObject.options) {
+                        oneObject.options = {};
+                    }
+                    oneObject.options.iconImageHref = vMarker.iconImageHref;
+                    oneObject.options.iconColor = vMarker.iconColor;
+                }
+                objectColection.push(oneObject);
             }
-
-            this.objectManager.add(objectColection);
-            this.Map.geoObjects.add(this.objectManager);
-
-            return this.objectManager;
+            objectManager.add(objectColection);
+            this.Map.geoObjects.add(objectManager);
+            return objectManager;
         }
     }]);
 
@@ -211,7 +355,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
             args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsZoom.__proto__ || Object.getPrototypeOf(YMapsZoom)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="range">\n                <button id="zoom-out" class="range-btn">\n                    <svg width="23" height="5" viewBox="0 0 23 5" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="22.3064" y="0.63501" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 0.63501)" fill="#36A6F2"/>\n                    </svg>    \n                </button>\n                <div class="range-line range-line__active"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <div class="range-line"></div>\n                <button id="zoom-in" class="range-btn">\n                    <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="9.45898" y="0.790527" width="3.67068" height="22.1956" rx="1.83534" fill="#36A6F2"/>\n                        <rect x="22.3064" y="10.0388" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 10.0388)" fill="#36A6F2"/>\n                    </svg>                 \n                </button>\n            </div>', _temp), _possibleConstructorReturn(_this, _ret);
+        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsZoom.__proto__ || Object.getPrototypeOf(YMapsZoom)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="ymaps-range">\n                <button id="zoom-out" class="ymaps-range-btn">\n                    <svg width="23" height="5" viewBox="0 0 23 5" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="22.3064" y="0.63501" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 0.63501)" fill="#36A6F2"/>\n                    </svg>    \n                </button>\n                <div class="ymaps-range-line ymaps-range-line__active"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <div class="ymaps-range-line"></div>\n                <button id="zoom-in" class="ymaps-range-btn">\n                    <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">\n                        <rect x="9.45898" y="0.790527" width="3.67068" height="22.1956" rx="1.83534" fill="#36A6F2"/>\n                        <rect x="22.3064" y="10.0388" width="3.69927" height="22.0241" rx="1.84963" transform="rotate(90 22.3064 10.0388)" fill="#36A6F2"/>\n                    </svg>                 \n                </button>\n            </div>', _temp), _possibleConstructorReturn(_this, _ret);
     }
     /** Шаблон элемента */
 
@@ -234,7 +378,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     СustomZoomLayout.superclass.build.call(this);
 
                     // Получаем элементы отображающие текущий зум
-                    this.zoomBtnItem = document.querySelectorAll('.range-line');
+                    this.zoomBtnItem = document.querySelectorAll('.ymaps-range-line');
 
                     // Привязываем функции-обработчики к контексту и сохраняем ссылки на них, чтобы потом отписаться от событий.
                     this.zoomInCb = ymaps.util.bind(this.zoomIn, this);
@@ -245,7 +389,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     // Начинаем слушать события макета.
                     document.querySelector('#zoom-in').addEventListener('click', this.zoomInCb);
                     document.querySelector('#zoom-out').addEventListener('click', this.zoomOutCb);
-                    document.querySelector('.range').addEventListener('click', this.zoomByRangeLineClickCb);
+                    document.querySelector('.ymaps-range').addEventListener('click', this.zoomByRangeLineClickCb);
                     map.events.add('wheel', this.setCustomZoomValueCb);
 
                     // Получаем и устанавливаем значение zoom
@@ -259,7 +403,7 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     // Снимаем обработчики.
                     var zoomIn = document.querySelector('#zoom-in');
                     var zoomOut = document.querySelector('#zoom-out');
-                    var range = document.querySelector('.range');
+                    var range = document.querySelector('.ymaps-range');
 
                     if (zoomIn) {
                         zoomIn.removeEventListener('click', this.zoomInCb);
@@ -284,15 +428,15 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                 // Устанавливаем значение самодельного зума при клике по одной из полосок на нем
                 zoomByRangeLineClick: function zoomByRangeLineClick(e) {
                     var map = this.getData().map;
-                    if (e.target.classList.contains('range-line')) {
+                    if (e.target.classList.contains('ymaps-range-line')) {
                         for (var i = 0; i < this.zoomBtnItem.length; i++) {
-                            this.zoomBtnItem[i].classList.remove('range-line__active');
+                            this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
-                        e.target.classList.add('range-line__active');
+                        e.target.classList.add('ymaps-range-line__active');
                         var indexOfActive = 0;
-                        var zoomBtnItemNew = document.querySelectorAll('.range-line');
+                        var zoomBtnItemNew = document.querySelectorAll('.ymaps-range-line');
                         for (var _i = 0; _i < zoomBtnItemNew.length; _i++) {
-                            if (zoomBtnItemNew[_i].classList.contains('range-line__active')) {
+                            if (zoomBtnItemNew[_i].classList.contains('ymaps-range-line__active')) {
                                 indexOfActive = _i;
                             }
                         }
@@ -307,11 +451,11 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
 
                     var checkInterval = setInterval(function () {
                         var zoom = map.getZoom();
-                        _this2.zoomBtnItem[zoom - 10].classList.add('range-line__active');
+                        _this2.zoomBtnItem[zoom - 10].classList.add('ymaps-range-line__active');
                         for (var i = 0; i < _this2.zoomBtnItem.length; i++) {
-                            _this2.zoomBtnItem[i].classList.remove('range-line__active');
+                            _this2.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
-                        _this2.zoomBtnItem[zoom - 10].classList.add('range-line__active');
+                        _this2.zoomBtnItem[zoom - 10].classList.add('ymaps-range-line__active');
                     }, 10);
 
                     this.zoomScrollTimeout = setTimeout(function () {
@@ -326,14 +470,14 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     if (zoom < 19) {
                         map.setZoom(zoom + 1, this.zoomOptions);
                         for (var i = 0; i < this.zoomBtnItem.length; i++) {
-                            this.zoomBtnItem[i].classList.remove('range-line__active');
+                            this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
 
                         var curr_zoom = map.getZoom();
 
-                        this.zoomBtnItem[curr_zoom + 1 - 10].classList.add('range-line__active');
+                        this.zoomBtnItem[curr_zoom + 1 - 10].classList.add('ymaps-range-line__active');
                     } else {
-                        this.zoomBtnItem[this.zoomBtnItem.length - 1].classList.add('range-line__active');
+                        this.zoomBtnItem[this.zoomBtnItem.length - 1].classList.add('ymaps-range-line__active');
                     }
                 },
                 // Отдалить
@@ -344,12 +488,12 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
                     if (zoom > 10) {
                         map.setZoom(zoom - 1, this.zoomOptions);
                         for (var i = 0; i < this.zoomBtnItem.length; i++) {
-                            this.zoomBtnItem[i].classList.remove('range-line__active');
+                            this.zoomBtnItem[i].classList.remove('ymaps-range-line__active');
                         }
                         var curr_zoom = map.getZoom();
-                        this.zoomBtnItem[curr_zoom - 1 - 10].classList.add('range-line__active');
+                        this.zoomBtnItem[curr_zoom - 1 - 10].classList.add('ymaps-range-line__active');
                     } else {
-                        this.zoomBtnItem[0].classList.add('range-line__active');
+                        this.zoomBtnItem[0].classList.add('ymaps-range-line__active');
                     }
                 }
             });
@@ -360,6 +504,22 @@ var YMapsZoom = exports.YMapsZoom = function (_YMapsBase) {
 
     return YMapsZoom;
 }(_YMapsCtrlBase.YMapsBase);
+
+/***/ }),
+
+/***/ "1720":
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__("4e84");
+if(content.__esModule) content = content.default;
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var add = __webpack_require__("499e").default
+var update = add("7783585f", content, true, {"sourceMap":false,"shadowMode":false});
 
 /***/ }),
 
@@ -395,9 +555,25 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 exports.default = {
     name: 'YandexMap',
     props: {
+        /**
+         * список кластеров
+         * @type {Array.<
+         * {id:number, latitude:string, longitude: string, iconImageHref: string,  iconColor: string,
+         * balloonContent: {html: string, methods: object},
+         * }>} 
+        */
         markers: {
             type: Array,
-            default: null
+            default: function _default() {
+                return [];
+            }
+        },
+        /**
+         * Ставить ли маркер по клику
+         */
+        isMarkerOnClick: {
+            type: Boolean,
+            default: false
         },
         coordsCenter: {
             type: Array,
@@ -411,18 +587,25 @@ exports.default = {
             type: Array,
             default: null
         },
+        putMarkerInSearch: {
+            type: Boolean,
+            default: false
+        },
         currentCoords: [],
         pathToBaloon: ''
     },
 
     data: function data() {
         return {
+            mapCustom: null,
             map: null,
             coords: [],
             objectManager: null,
             point: null,
             oneMarker: null,
             searchControl: null,
+            searchManager: null,
+            zoomManager: null,
             mapId: 'yandex-map-' + Math.round(Math.random() * 1000)
         };
     },
@@ -446,7 +629,7 @@ exports.default = {
         // Инициализация карты
         initializeYandexMap: function () {
             var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-                var markers, Map, _ref2, map, map_objects, search_control, zoom_control;
+                var markers, _ref2, map, map_objects, search_control, zoom_control;
 
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
@@ -460,7 +643,7 @@ exports.default = {
                                 }
 
                                 // Создаём объект карты
-                                Map = new _YandexMap.YMapsCustom({
+                                this.mapCustom = new _YandexMap.YMapsCustom({
                                     mapId: this.mapId,
                                     center: this.coordsCenter,
                                     controls: [],
@@ -470,10 +653,12 @@ exports.default = {
                                         minZoom: 10,
                                         maxZoom: 19
                                     },
-                                    pathToBaloon: this.pathToBaloon
+                                    pathToBaloon: this.pathToBaloon,
+                                    putMarkerInSearch: this.putMarkerInSearch
                                 });
+
                                 _context.next = 5;
-                                return Map.faInitMap();
+                                return this.mapCustom.faInitMap();
 
                             case 5:
                                 _ref2 = _context.sent;
@@ -485,8 +670,10 @@ exports.default = {
 
                                 this.map = map;
                                 this.objectManager = map_objects;
+                                this.searchManager = search_control;
+                                this.zoomManager = zoom_control;
 
-                                if (!this.markers) {
+                                if (!this.markers || this.isMarkerOnClick) {
                                     this.map.events.add('click', this.onClickMap);
                                     this.searchControl = new ymaps.control.SearchControl({
                                         options: {
@@ -499,15 +686,19 @@ exports.default = {
                                         this.oneMarker = new ymaps.Placemark(this.oneMarkerCoords);
                                         this.map.geoObjects.add(this.oneMarker);
                                     }
+                                    if (this.putMarkerInSearch) {
+                                        this.map.geoObjects.events.add('click', this.onClickOnceMarket);
+                                    }
                                     this.map.controls.add(this.searchControl);
                                     this.searchControl.events.add('resultselect', this.Search);
-                                } else this.setMarkers();
+                                } else {
+                                    this.objectManager.objects.events.add(['click'], this.onClickEvent);
+                                }
 
                                 this.map.events.add(['boundschange', 'datachange', 'objecttypeschange'], this.getVisibleObjects.bind(this));
-
                                 this.$emit("InitializeYandexMap", this.map);
 
-                            case 15:
+                            case 17:
                             case 'end':
                                 return _context.stop();
                         }
@@ -536,12 +727,6 @@ exports.default = {
         },
 
 
-        // Установка маркеров на карте
-        setMarkers: function setMarkers() {
-            this.objectManager.objects.events.add(['click'], this.onClickEvent);
-        },
-
-
         // Событие клика на маркер
         onClickEvent: function onClickEvent(e) {
             var objectId = e.get('objectId'),
@@ -557,10 +742,19 @@ exports.default = {
         // Событие клика по карте
         onClickMap: function onClickMap(e) {
             var coords = e.get('coords');
-            this.map.geoObjects.removeAll();
+            if (this.oneMarker) {
+                this.map.geoObjects.remove(this.oneMarker);
+            }
             this.oneMarker = new ymaps.Placemark(coords);
             this.map.geoObjects.add(this.oneMarker);
             this.$emit("ClickMap", coords);
+        },
+
+
+        /** Событие клика по маркеру при выборе города */
+        onClickOnceMarket: function onClickOnceMarket(e) {
+            var coords = e.get('coords');
+            this.$emit("ClickOneMarker", coords);
         },
 
 
@@ -581,35 +775,22 @@ exports.default = {
         coordsCenter: function coordsCenter() {
             if (this.coordsCenter && this.map) {
                 this.map.setCenter(this.coordsCenter);
-                this.setMarkers();
             }
         },
         markers: {
             handler: function () {
                 var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-                    var objectColection, i;
                     return _regenerator2.default.wrap(function _callee2$(_context2) {
                         while (1) {
                             switch (_context2.prev = _context2.next) {
                                 case 0:
-                                    this.objectManager.removeAll();
-                                    objectColection = [];
-
-
-                                    for (i = 0; i < this.markers.length; i++) {
-                                        objectColection.push({
-                                            type: 'Feature',
-                                            id: this.markers[i].id,
-                                            geometry: {
-                                                type: 'Point',
-                                                coordinates: [this.markers[i].latitude, this.markers[i].longitude]
-                                            }
-                                        });
+                                    if (this.mapCustom) {
+                                        this.mapCustom.markers = this.markers;
+                                        this.objectManager = this.mapCustom.fInitMapObjects();
+                                        this.objectManager.objects.events.add(['click'], this.onClickEvent);
                                     }
 
-                                    this.objectManager.add(objectColection);
-
-                                case 4:
+                                case 1:
                                 case 'end':
                                     return _context2.stop();
                             }
@@ -634,6 +815,18 @@ exports.default = {
                         document.querySelector('#zoom-in').click();
                     }, 300);
                 }
+            }
+        },
+        isMarkerOnClick: function isMarkerOnClick(newValue) {
+            if (newValue) {
+                undefined.map.events.add('click', undefined.onClickMap);
+                if (undefined.oneMarkerCoords) {
+                    undefined.oneMarker = new ymaps.Placemark(undefined.oneMarkerCoords);
+                    undefined.map.geoObjects.add(undefined.oneMarker);
+                }
+            } else {
+                undefined.map.events.remove('click', undefined.onClickMap);
+                undefined.map.geoObjects.remove(undefined.oneMarker);
             }
         }
     },
@@ -680,6 +873,108 @@ exports.default = null;
 
 /***/ }),
 
+/***/ "24fb":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+// eslint-disable-next-line func-names
+
+module.exports = function (useSourceMap) {
+  var list = []; // return the list of modules as css string
+
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = cssWithMappingToString(item, useSourceMap);
+
+      if (item[2]) {
+        return "@media ".concat(item[2], " {").concat(content, "}");
+      }
+
+      return content;
+    }).join('');
+  }; // import a list of modules into the list
+  // eslint-disable-next-line func-names
+
+
+  list.i = function (modules, mediaQuery, dedupe) {
+    if (typeof modules === 'string') {
+      // eslint-disable-next-line no-param-reassign
+      modules = [[null, modules, '']];
+    }
+
+    var alreadyImportedModules = {};
+
+    if (dedupe) {
+      for (var i = 0; i < this.length; i++) {
+        // eslint-disable-next-line prefer-destructuring
+        var id = this[i][0];
+
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+
+    for (var _i = 0; _i < modules.length; _i++) {
+      var item = [].concat(modules[_i]);
+
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      if (mediaQuery) {
+        if (!item[2]) {
+          item[2] = mediaQuery;
+        } else {
+          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
+        }
+      }
+
+      list.push(item);
+    }
+  };
+
+  return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+  var content = item[1] || ''; // eslint-disable-next-line prefer-destructuring
+
+  var cssMapping = item[3];
+
+  if (!cssMapping) {
+    return content;
+  }
+
+  if (useSourceMap && typeof btoa === 'function') {
+    var sourceMapping = toComment(cssMapping);
+    var sourceURLs = cssMapping.sources.map(function (source) {
+      return "/*# sourceURL=".concat(cssMapping.sourceRoot || '').concat(source, " */");
+    });
+    return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+  }
+
+  return [content].join('\n');
+} // Adapted from convert-source-map (MIT)
+
+
+function toComment(sourceMap) {
+  // eslint-disable-next-line no-undef
+  var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+  var data = "sourceMappingURL=data:application/json;charset=utf-8;base64,".concat(base64);
+  return "/*# ".concat(data, " */");
+}
+
+/***/ }),
+
 /***/ "2773":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -715,12 +1010,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 /** Модуль инициализации карты */
 var YMapsCustom = exports.YMapsCustom = function () {
-
     /** Контроллеры карты */
 
-
     /** Начальные опции зума */
-
 
     /** Элементы управления для отрисовки */
 
@@ -734,24 +1026,26 @@ var YMapsCustom = exports.YMapsCustom = function () {
         this.markers = MapConfig.markers;
         this.zoomOptions = MapConfig.zoomOptions;
         this.pathToBaloon = MapConfig.pathToBaloon;
+        this.putMarkerInSearch = MapConfig.putMarkerInSearch;
     }
-
-    /** Инициализация карты */
-
-
     /** Путь до изображения балуна */
-
 
     /** Объект карты */
 
-
     /** Маркеры на карте */
-
 
     /** Координаты центра */
 
 
     _createClass(YMapsCustom, [{
+        key: 'fInitMapObjects',
+        value: function fInitMapObjects() {
+            return (0, _YmapsAddTpl.fAddBaloonToMap)(_YMapsObjects.YMapsObjects, this);
+        }
+
+        /** Инициализация карты */
+
+    }, {
         key: 'faInitMap',
         value: function () {
             var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
@@ -780,13 +1074,13 @@ var YMapsCustom = exports.YMapsCustom = function () {
                                 this.MapControls = {};
 
                                 // Добавить кастомный инпут поиска
-                                this.MapControls.search_control = (0, _YmapsAddTpl.fAddTemplateToMap)(_YMapsSearch.YMapsSearch, this);
+                                this.MapControls.search_control = (0, _YmapsAddTpl.fAddMarkerToMap)(_YMapsSearch.YMapsSearch, this);
 
                                 // Добавим кастомный элемент зума карты
                                 this.MapControls.zoom_control = (0, _YmapsAddTpl.fAddTemplateToMap)(_YMapsZoom.YMapsZoom, this);
 
                                 // Добавим объекты на карту
-                                this.MapControls.map_objects = (0, _YmapsAddTpl.fAddBaloonToMap)(_YMapsObjects.YMapsObjects, this.pathToBaloon, this);
+                                this.MapControls.map_objects = this.fInitMapObjects();
 
                                 // Вернем созданные объекты для взаимодействия с Vue
                                 return _context.abrupt('return', {
@@ -929,10 +1223,12 @@ function normalizeComponent (
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _YandexMap_vue_vue_type_template_id_243b855b___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("57d1");
+/* harmony import */ var _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("e3d7");
 /* harmony import */ var _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("3d5c");
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("2877");
+/* harmony import */ var _YandexMap_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("5469");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("2877");
+
 
 
 
@@ -940,10 +1236,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /* normalize component */
 
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[/* default */ "a"])(
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__[/* default */ "a"])(
   _YandexMap_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _YandexMap_vue_vue_type_template_id_243b855b___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
-  _YandexMap_vue_vue_type_template_id_243b855b___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
+  _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__[/* render */ "a"],
+  _YandexMap_vue_vue_type_template_id_067e7bd8___WEBPACK_IMPORTED_MODULE_0__[/* staticRenderFns */ "b"],
   false,
   null,
   null,
@@ -967,21 +1263,261 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "57d1":
+/***/ "499e":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return addStylesClient; });
+/* harmony import */ var _listToStyles__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("9bbc");
+/* harmony import */ var _listToStyles__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_listToStyles__WEBPACK_IMPORTED_MODULE_0__);
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+  Modified by Evan You @yyx990803
+*/
 
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
-__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"dad4796a-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=243b855b&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
-var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=243b855b&
+var hasDocument = typeof document !== 'undefined'
+
+if (typeof DEBUG !== 'undefined' && DEBUG) {
+  if (!hasDocument) {
+    throw new Error(
+    'vue-style-loader cannot be used in a non-browser environment. ' +
+    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
+  ) }
+}
+
+/*
+type StyleObject = {
+  id: number;
+  parts: Array<StyleObjectPart>
+}
+
+type StyleObjectPart = {
+  css: string;
+  media: string;
+  sourceMap: ?string
+}
+*/
+
+var stylesInDom = {/*
+  [id: number]: {
+    id: number,
+    refs: number,
+    parts: Array<(obj?: StyleObjectPart) => void>
+  }
+*/}
+
+var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
+var singletonElement = null
+var singletonCounter = 0
+var isProduction = false
+var noop = function () {}
+var options = null
+var ssrIdKey = 'data-vue-ssr-id'
+
+// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+// tags it will allow on a page
+var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+
+function addStylesClient (parentId, list, _isProduction, _options) {
+  isProduction = _isProduction
+
+  options = _options || {}
+
+  var styles = _listToStyles__WEBPACK_IMPORTED_MODULE_0___default()(parentId, list)
+  addStylesToDom(styles)
+
+  return function update (newList) {
+    var mayRemove = []
+    for (var i = 0; i < styles.length; i++) {
+      var item = styles[i]
+      var domStyle = stylesInDom[item.id]
+      domStyle.refs--
+      mayRemove.push(domStyle)
+    }
+    if (newList) {
+      styles = _listToStyles__WEBPACK_IMPORTED_MODULE_0___default()(parentId, newList)
+      addStylesToDom(styles)
+    } else {
+      styles = []
+    }
+    for (var i = 0; i < mayRemove.length; i++) {
+      var domStyle = mayRemove[i]
+      if (domStyle.refs === 0) {
+        for (var j = 0; j < domStyle.parts.length; j++) {
+          domStyle.parts[j]()
+        }
+        delete stylesInDom[domStyle.id]
+      }
+    }
+  }
+}
+
+function addStylesToDom (styles /* Array<StyleObject> */) {
+  for (var i = 0; i < styles.length; i++) {
+    var item = styles[i]
+    var domStyle = stylesInDom[item.id]
+    if (domStyle) {
+      domStyle.refs++
+      for (var j = 0; j < domStyle.parts.length; j++) {
+        domStyle.parts[j](item.parts[j])
+      }
+      for (; j < item.parts.length; j++) {
+        domStyle.parts.push(addStyle(item.parts[j]))
+      }
+      if (domStyle.parts.length > item.parts.length) {
+        domStyle.parts.length = item.parts.length
+      }
+    } else {
+      var parts = []
+      for (var j = 0; j < item.parts.length; j++) {
+        parts.push(addStyle(item.parts[j]))
+      }
+      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
+    }
+  }
+}
+
+function createStyleElement () {
+  var styleElement = document.createElement('style')
+  styleElement.type = 'text/css'
+  head.appendChild(styleElement)
+  return styleElement
+}
+
+function addStyle (obj /* StyleObjectPart */) {
+  var update, remove
+  var styleElement = document.querySelector('style[' + ssrIdKey + '~="' + obj.id + '"]')
+
+  if (styleElement) {
+    if (isProduction) {
+      // has SSR styles and in production mode.
+      // simply do nothing.
+      return noop
+    } else {
+      // has SSR styles but in dev mode.
+      // for some reason Chrome can't handle source map in server-rendered
+      // style tags - source maps in <style> only works if the style tag is
+      // created and inserted dynamically. So we remove the server rendered
+      // styles and inject new ones.
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  if (isOldIE) {
+    // use singleton mode for IE9.
+    var styleIndex = singletonCounter++
+    styleElement = singletonElement || (singletonElement = createStyleElement())
+    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
+    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
+  } else {
+    // use multi-style-tag mode in all other cases
+    styleElement = createStyleElement()
+    update = applyToTag.bind(null, styleElement)
+    remove = function () {
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  update(obj)
+
+  return function updateStyle (newObj /* StyleObjectPart */) {
+    if (newObj) {
+      if (newObj.css === obj.css &&
+          newObj.media === obj.media &&
+          newObj.sourceMap === obj.sourceMap) {
+        return
+      }
+      update(obj = newObj)
+    } else {
+      remove()
+    }
+  }
+}
+
+var replaceText = (function () {
+  var textStore = []
+
+  return function (index, replacement) {
+    textStore[index] = replacement
+    return textStore.filter(Boolean).join('\n')
+  }
+})()
+
+function applyToSingletonTag (styleElement, index, remove, obj) {
+  var css = remove ? '' : obj.css
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = replaceText(index, css)
+  } else {
+    var cssNode = document.createTextNode(css)
+    var childNodes = styleElement.childNodes
+    if (childNodes[index]) styleElement.removeChild(childNodes[index])
+    if (childNodes.length) {
+      styleElement.insertBefore(cssNode, childNodes[index])
+    } else {
+      styleElement.appendChild(cssNode)
+    }
+  }
+}
+
+function applyToTag (styleElement, obj) {
+  var css = obj.css
+  var media = obj.media
+  var sourceMap = obj.sourceMap
+
+  if (media) {
+    styleElement.setAttribute('media', media)
+  }
+  if (options.ssrId) {
+    styleElement.setAttribute(ssrIdKey, obj.id)
+  }
+
+  if (sourceMap) {
+    // https://developer.chrome.com/devtools/docs/javascript-debugging
+    // this makes source maps inside style tags work properly in Chrome
+    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
+    // http://stackoverflow.com/a/26603875
+    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
+  }
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild)
+    }
+    styleElement.appendChild(document.createTextNode(css))
+  }
+}
+
+
+/***/ }),
+
+/***/ "4e84":
+/***/ (function(module, exports, __webpack_require__) {
+
+// Imports
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__("24fb");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+// Module
+exports.push([module.i, ".ymap-pvz-popover{background:#fff;border-radius:8px;position:relative;box-shadow:0 0 8px rgba(0,0,0,.15);width:-webkit-fit-content;width:-moz-fit-content;width:fit-content}.ymap-pvz-popover-close{width:22px;height:22px;border-radius:50%;background:#4f4f50;position:absolute;top:-11px;right:-11px;cursor:pointer;display:flex;justify-content:center;align-items:center;color:#fff}.ymap-pvz-popover-arrow{display:block;width:6px;height:6px;position:absolute;left:calc(50% - 3px);bottom:-3px;background-color:inherit;transform:rotate(45deg);box-shadow:0 0 8px rgba(0,0,0,.15)}", ""]);
+// Exports
+module.exports = exports;
+
+
+/***/ }),
+
+/***/ "5469":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var _node_modules_vue_style_loader_index_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("1720");
+/* harmony import */ var _node_modules_vue_style_loader_index_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_YandexMap_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* unused harmony reexport * */
 
 
 /***/ }),
@@ -1032,13 +1568,14 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var YMapsBase = exports.YMapsBase = function () {
-	function YMapsBase(map) {
+	function YMapsBase(map, putMarkerInSearch) {
 		_classCallCheck(this, YMapsBase);
 
 		this.events = new ymaps.event.Manager();
 		this.options = new ymaps.option.Manager();
 		this.state = new ymaps.data.Manager();
 		this.Map = map;
+		this.putMarkerInSearch = putMarkerInSearch;
 	}
 
 	/** Устанвливаем родительский элемент для контрола созданного с помощью templateLayoutFactory */
@@ -1109,7 +1646,7 @@ var YMapsSearch = exports.YMapsSearch = function (_YMapsBase) {
 			args[_key] = arguments[_key];
 		}
 
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsSearch.__proto__ || Object.getPrototypeOf(YMapsSearch)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="input-wrapper">\n\t\t\t\t<input placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0430\u0434\u0440\u0435\u0441" id="suggest" class="yamaps-search__input" type="text">\n\t\t\t\t<button id="search_btn" class="yamaps-search__button">\u041D\u0430\u0439\u0442\u0438</button>\n\t\t\t</div>', _temp), _possibleConstructorReturn(_this, _ret);
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsSearch.__proto__ || Object.getPrototypeOf(YMapsSearch)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = '<div class="ymaps-input-wrapper">\n\t\t\t\t<input placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0430\u0434\u0440\u0435\u0441" id="suggest" class="yamaps-search__input" type="text">\n\t\t\t\t<button id="search_btn" class="yamaps-search__button">\u041D\u0430\u0439\u0442\u0438</button>\n\t\t\t</div>', _temp), _possibleConstructorReturn(_this, _ret);
 	}
 	/** Шаблон элемента */
 
@@ -1127,6 +1664,8 @@ var YMapsSearch = exports.YMapsSearch = function (_YMapsBase) {
 				suggestionValue: null,
 				/** Объект карты, получаем из родительского модуля */
 				Map: this.Map,
+				/** Нужно ли ставить маркер при поиске в центр карты */
+				putMarkerInSearch: this.putMarkerInSearch,
 
 				build: function build() {
 					SearchLayout.superclass.build.call(this);
@@ -1195,6 +1734,11 @@ var YMapsSearch = exports.YMapsSearch = function (_YMapsBase) {
 					ymaps.geocode(value).then(function (result) {
 						var coords = result.geoObjects.get(0).geometry.getCoordinates();
 						_this2.Map.setCenter([coords[0], coords[1]]);
+						if (_this2.putMarkerInSearch) {
+							_this2.Map.geoObjects.removeAll();
+							_this2.oneMarker = new ymaps.Placemark(coords);
+							_this2.Map.geoObjects.add(_this2.oneMarker);
+						}
 					});
 				},
 
@@ -1338,7 +1882,7 @@ var YMapsStyles = exports.YMapsStyles = function (_YMapsBase) {
 			args[_key] = arguments[_key];
 		}
 
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsStyles.__proto__ || Object.getPrototypeOf(YMapsStyles)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = "<style>\n            \t.range {\n            \t    width: 40px;\n            \t    height: 225px;\n            \t    padding: 5px;\n            \t    box-sizing: border-box;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: space-between;\n            \t    background: rgba(218,218,218,0.49);\n            \t    border-radius: 9px;\n            \t    cursor: pointer;\n            \t    position: absolute;\n            \t    right: 15px;\n            \t    top: 275px;\n            \t}\n            \t.range-btn  {\n            \t    width: 30px;\n            \t    height: 30px;\n            \t    padding: 2px;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: center;\n            \t    align-items: center;\n            \t    box-sizing: border-box;\n            \t    border: none;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 4px;\n            \t    cursor: pointer;\n            \t}\n            \t.range-icon {\n            \t    width: 100%;\n            \t    background-color: blue;\n            \t    border-radius: 10550px;\n            \t}\n            \t.range-plus__horizontal {\n            \t    transform: rotate(45deg);\n            \t    top: -50%;\n            \t}\n            \t.range-line {\n            \t    width: 30px;\n            \t    height: 3px;\n            \t    background: #F9F9F9;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 3px;\n            \t}\n            \t.range-line.range-line__active {\n            \t    width: 29.79px;\n            \t    height: 8.58px;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 4.28846px #979797;\n            \t    border-radius: 3px;\n            \t}\n            \t.input-wrapper {\n\t\t\t\t\tposition: absolute;\n\t\t\t\t\ttop: 10px;\n\t\t\t\t\tleft: 10px;\n\t\t\t\t\tborder: 1px solid transparent;\n\t\t\t\t\twidth: 320px;\n\t\t\t\t\theight: 36px;\n\t\t\t\t\tbackground: #FFFFFF;\n\t\t\t\t\tborder-radius: 35px;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: stretch;\n\t\t\t\t\tjustify-content: space-between;\n\t\t\t\t\tbackground-color: transparent;\n\t\t\t\t\tfilter: drop-shadow(0px 1px 8px rgba(96, 98, 102, 0.3));\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input {\n\t\t\t\t\twidth: 64%;\n\t\t\t\t\tborder-top-left-radius: 35px;\n\t\t\t\t\tborder-bottom-left-radius: 35px;\n\t\t\t\t\theight: 100%;\n\t\t\t\t\tpadding-left: 12px;\n\t\t\t\t\tborder: none;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input::placeholder {\n\t\t\t\t\tfont-weight: 400;\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tline-height: 14px;\n\t\t\t\t\tcolor: #606266;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input:focus {\n\t\t\t\t\toutline: none;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__button {\n\t\t\t\t\twidth: 40%;\n\t\t\t\t\tbackground-color: #FFE485;\n\t\t\t\t\theight: 35px;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t\tborder-top-right-radius: 35px;\n\t\t\t\t\tborder-bottom-right-radius: 35px;\n\t\t\t\t\tfont-family: 'Open Sans';\n\t\t\t\t\tfont-style: normal;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t\tfont-size: 12px;\n\t\t\t\t\tline-height: 16px;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tcolor: #1D1E1F;\n\t\t\t\t}\n\t\t\t\t.ymaps-2-1-79-copyright__content,\n            \t.ymaps-2-1-79-gototech,\n            \t.ymaps-2-1-79-gotoymaps__container {\n            \t    display: none;\n            \t}\n\t\t\t\t@media screen and ( max-width: 550px) {\n\t\t\t\t\t.range {\n\t\t\t\t\t\ttop: 150px;\n\t\t\t\t\t}\n\t\t\t\t}\n            </style>", _temp), _possibleConstructorReturn(_this, _ret);
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = YMapsStyles.__proto__ || Object.getPrototypeOf(YMapsStyles)).call.apply(_ref, [this].concat(args))), _this), _this.tpl = "<style>\n            \t.ymaps-range {\n            \t    width: 40px;\n            \t    height: 225px;\n            \t    padding: 5px;\n            \t    box-sizing: border-box;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: space-between;\n            \t    background: rgba(218,218,218,0.49);\n            \t    border-radius: 9px;\n            \t    cursor: pointer;\n            \t    position: absolute;\n            \t    right: 15px;\n            \t    top: 275px;\n            \t}\n            \t.ymaps-range-btn  {\n            \t    width: 30px;\n            \t    height: 30px;\n            \t    padding: 2px;\n            \t    display: flex;\n            \t    flex-direction: column;\n            \t    justify-content: center;\n            \t    align-items: center;\n            \t    box-sizing: border-box;\n            \t    border: none;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 4px;\n            \t    cursor: pointer;\n            \t}\n            \t.ymaps-range-line {\n            \t    width: 30px;\n            \t    height: 3px;\n            \t    background: #F9F9F9;\n            \t    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);\n            \t    border-radius: 3px;\n            \t}\n            \t.ymaps-range-line.ymaps-range-line__active {\n            \t    width: 29.79px;\n            \t    height: 8.58px;\n            \t    background: #FFFFFF;\n            \t    box-shadow: 0px 0px 4.28846px #979797;\n            \t    border-radius: 3px;\n            \t}\n            \t.ymaps-input-wrapper {\n\t\t\t\t\tposition: absolute;\n\t\t\t\t\ttop: 10px;\n\t\t\t\t\tleft: 10px;\n\t\t\t\t\tborder: 1px solid transparent;\n\t\t\t\t\twidth: 320px;\n\t\t\t\t\theight: 36px;\n\t\t\t\t\tbackground: #FFFFFF;\n\t\t\t\t\tborder-radius: 35px;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: stretch;\n\t\t\t\t\tjustify-content: space-between;\n\t\t\t\t\tbackground-color: transparent;\n\t\t\t\t\tfilter: drop-shadow(0px 1px 8px rgba(96, 98, 102, 0.3));\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input {\n\t\t\t\t\twidth: 64%;\n\t\t\t\t\tborder-top-left-radius: 35px;\n\t\t\t\t\tborder-bottom-left-radius: 35px;\n\t\t\t\t\theight: 100%;\n\t\t\t\t\tpadding-left: 12px;\n\t\t\t\t\tborder: none;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input::placeholder {\n\t\t\t\t\tfont-weight: 400;\n\t\t\t\t\tfont-size: 13px;\n\t\t\t\t\tline-height: 14px;\n\t\t\t\t\tcolor: #606266;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__input:focus {\n\t\t\t\t\toutline: none;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t}\n\t\t\t\t.yamaps-search__button {\n\t\t\t\t\twidth: 40%;\n\t\t\t\t\tbackground-color: #FFE485;\n\t\t\t\t\theight: 35px;\n\t\t\t\t\tborder: 1px solid #FFE485;\n\t\t\t\t\tborder-top-right-radius: 35px;\n\t\t\t\t\tborder-bottom-right-radius: 35px;\n\t\t\t\t\tfont-family: 'Open Sans';\n\t\t\t\t\tfont-style: normal;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t\tfont-size: 12px;\n\t\t\t\t\tline-height: 16px;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tcolor: #1D1E1F;\n\t\t\t\t}\n\t\t\t\t.ymaps-2-1-79-copyright__content,\n            \t.ymaps-2-1-79-gototech,\n            \t.ymaps-2-1-79-gotoymaps__container,\n\t\t\t\t.ymaps-2-1-79-float-button,\n\t\t\t\t.ymaps-2-1-79-_hidden-icon,\n\t\t\t\t.ymaps-2-1-79-gototaxi,\n\t\t\t\t.ymaps-2-1-79-searchbox__normal-layout {\n            \t    display: none;\n            \t}\n\t\t\t\t@media screen and ( max-width: 550px) {\n\t\t\t\t\t.range {\n\t\t\t\t\t\ttop: 150px;\n\t\t\t\t\t}\n\t\t\t\t}\n            </style>", _temp), _possibleConstructorReturn(_this, _ret);
 	}
 	/** Шаблон элемента */
 
@@ -2076,6 +2620,46 @@ function () {
 
 /***/ }),
 
+/***/ "9bbc":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = listToStyles;
+/**
+ * Translates the list format produced by css-loader into something
+ * easier to manipulate.
+ */
+function listToStyles(parentId, list) {
+  var styles = [];
+  var newStyles = {};
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = item[0];
+    var css = item[1];
+    var media = item[2];
+    var sourceMap = item[3];
+    var part = {
+      id: parentId + ':' + i,
+      css: css,
+      media: media,
+      sourceMap: sourceMap
+    };
+    if (!newStyles[id]) {
+      styles.push(newStyles[id] = { id: id, parts: [part] });
+    } else {
+      newStyles[id].parts.push(part);
+    }
+  }
+  return styles;
+}
+
+/***/ }),
+
 /***/ "a0b6":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2087,6 +2671,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.fAddTemplateToMap = fAddTemplateToMap;
 exports.fAddBaloonToMap = fAddBaloonToMap;
+exports.fAddMarkerToMap = fAddMarkerToMap;
 /** Добавить контроллеры на карту (Поиск, Зум) */
 function fAddTemplateToMap(Cls, ctx) {
 	var cls = new Cls(ctx.Map);
@@ -2097,9 +2682,21 @@ function fAddTemplateToMap(Cls, ctx) {
 }
 
 /** Добавить на карту объекты */
-function fAddBaloonToMap(Cls, pathToBaloon, ctx) {
-	var cls = new Cls(ctx.Map, ctx.markers);
-	return cls.fCreate(pathToBaloon);
+function fAddBaloonToMap(Cls, ctx) {
+	var cls = new Cls({
+		Map: ctx.Map,
+		markers: ctx.markers,
+		pathToBaloon: ctx.pathToBaloon
+	});
+	return cls.fCreate();
+}
+
+/** Добавить контроллеры на карту (Поиск, Зум) и флаг добавления маркера при поиске*/
+function fAddMarkerToMap(Cls, ctx) {
+	var cls = new Cls(ctx.Map, ctx.putMarkerInSearch);
+	cls.fCreate();
+	ctx.Map.controls.add(cls, {});
+	return cls;
 }
 
 /***/ }),
@@ -2177,6 +2774,25 @@ if (hadRuntime) {
 
 
 module.exports = __webpack_require__("bbdd");
+
+/***/ }),
+
+/***/ "e3d7":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* reexport */ render; });
+__webpack_require__.d(__webpack_exports__, "b", function() { return /* reexport */ staticRenderFns; });
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"75a6de23-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/component/YandexMap.vue?vue&type=template&id=067e7bd8&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"ymap-wrapper__custom",staticStyle:{"width":"100%","height":"100%","max-height":"520px","position":"relative","border":"1px solid transparent","border-radius":"17px","overflow":"hidden"}},[_c('div',{staticStyle:{"width":"100%","height":"100%"},attrs:{"id":_vm.mapId}})])}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/component/YandexMap.vue?vue&type=template&id=067e7bd8&
+
 
 /***/ }),
 

@@ -3,7 +3,7 @@ import { YMapsBase } from "./YMapsCtrlBase";
 export class YMapsStyles extends YMapsBase {
 	/** Шаблон элемента */
 	tpl = `<style>
-            	.range {
+            	.ymaps-range {
             	    width: 40px;
             	    height: 225px;
             	    padding: 5px;
@@ -18,7 +18,7 @@ export class YMapsStyles extends YMapsBase {
             	    right: 15px;
             	    top: 275px;
             	}
-            	.range-btn  {
+            	.ymaps-range-btn  {
             	    width: 30px;
             	    height: 30px;
             	    padding: 2px;
@@ -33,30 +33,21 @@ export class YMapsStyles extends YMapsBase {
             	    border-radius: 4px;
             	    cursor: pointer;
             	}
-            	.range-icon {
-            	    width: 100%;
-            	    background-color: blue;
-            	    border-radius: 10550px;
-            	}
-            	.range-plus__horizontal {
-            	    transform: rotate(45deg);
-            	    top: -50%;
-            	}
-            	.range-line {
+            	.ymaps-range-line {
             	    width: 30px;
             	    height: 3px;
             	    background: #F9F9F9;
             	    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);
             	    border-radius: 3px;
             	}
-            	.range-line.range-line__active {
+            	.ymaps-range-line.ymaps-range-line__active {
             	    width: 29.79px;
             	    height: 8.58px;
             	    background: #FFFFFF;
             	    box-shadow: 0px 0px 4.28846px #979797;
             	    border-radius: 3px;
             	}
-            	.input-wrapper {
+            	.ymaps-input-wrapper {
 					position: absolute;
 					top: 10px;
 					left: 10px;
