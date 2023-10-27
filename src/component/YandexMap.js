@@ -2,7 +2,6 @@ import { fAddTemplateToMap, fAddBaloonToMap, fAddMarkerToMap } from './service/Y
 import { YMapsSearch } from './YMapsControlModule/YMapsSearch';
 import { YMapsStyles } from './YMapsControlModule/YMapsStyles';
 import { YMapsObjects } from './YMapsObjectModule/YMapsObjects';
-import { YMapsZoom } from './YMapsControlModule/YMapsZoom';
 
 /** Модуль инициализации карты */
 export class YMapsCustom {
@@ -59,9 +58,6 @@ export class YMapsCustom {
         // Добавить кастомный инпут поиска
         this.MapControls.search_control = fAddMarkerToMap(YMapsSearch, this);
 
-        // Добавим кастомный элемент зума карты
-        this.MapControls.zoom_control = fAddTemplateToMap(YMapsZoom, this);
-
         // Добавим объекты на карту
         this.MapControls.map_objects = this.fInitMapObjects();
 
@@ -70,7 +66,6 @@ export class YMapsCustom {
             map: this.Map,
             map_objects: this.MapControls.map_objects,
             search_control: this.MapControls.search_control,
-            zoom_control: this.MapControls.zoom_control,
         }
     }
 }
