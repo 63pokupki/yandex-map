@@ -3,50 +3,6 @@ import { YMapsBase } from "./YMapsCtrlBase";
 export class YMapsStyles extends YMapsBase {
 	/** Шаблон элемента */
 	tpl = `<style>
-            	.ymaps-range {
-            	    width: 40px;
-            	    height: 225px;
-            	    padding: 5px;
-            	    box-sizing: border-box;
-            	    display: flex;
-            	    flex-direction: column;
-            	    justify-content: space-between;
-            	    background: rgba(218,218,218,0.49);
-            	    border-radius: 9px;
-            	    cursor: pointer;
-            	    position: absolute;
-            	    right: 15px;
-            	    top: 275px;
-            	}
-            	.ymaps-range-btn  {
-            	    width: 30px;
-            	    height: 30px;
-            	    padding: 2px;
-            	    display: flex;
-            	    flex-direction: column;
-            	    justify-content: center;
-            	    align-items: center;
-            	    box-sizing: border-box;
-            	    border: none;
-            	    background: #FFFFFF;
-            	    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);
-            	    border-radius: 4px;
-            	    cursor: pointer;
-            	}
-            	.ymaps-range-line {
-            	    width: 30px;
-            	    height: 3px;
-            	    background: #F9F9F9;
-            	    box-shadow: 0px 0px 8.57692px rgba(0, 0, 0, 0.15);
-            	    border-radius: 3px;
-            	}
-            	.ymaps-range-line.ymaps-range-line__active {
-            	    width: 29.79px;
-            	    height: 8.58px;
-            	    background: #FFFFFF;
-            	    box-shadow: 0px 0px 4.28846px #979797;
-            	    border-radius: 3px;
-            	}
             	.ymaps-input-wrapper {
 					position: absolute;
 					top: 10px;
@@ -99,7 +55,6 @@ export class YMapsStyles extends YMapsBase {
 				.ymaps-2-1-79-copyright__content,
             	.ymaps-2-1-79-gototech,
             	.ymaps-2-1-79-gotoymaps__container,
-				.ymaps-2-1-79-float-button,
 				.ymaps-2-1-79-_hidden-icon,
 				.ymaps-2-1-79-gototaxi,
 				.ymaps-2-1-79-searchbox__normal-layout {

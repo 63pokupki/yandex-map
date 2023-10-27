@@ -60,7 +60,6 @@ export default {
             oneMarker: null,
             searchControl: null,
             searchManager: null,
-            zoomManager: null,
             mapId: `yandex-map-${Math.round(Math.random() * 1000)}`
         };
     },
@@ -91,23 +90,22 @@ export default {
             this.mapCustom = new YMapsCustom({ 
                 mapId: this.mapId,
                 center: this.coordsCenter,
-                controls: [],
+                controls: ['zoomControl'],
                 markers: markers,
                 zoomOptions: {
                     zoom: 10,
-                    minZoom: 10,
+                    minZoom: 8,
                     maxZoom: 19
                 },
                 pathToBaloon: this.pathToBaloon,
                 putMarkerInSearch: this.putMarkerInSearch,
             });
 
-            const { map, map_objects, search_control, zoom_control } = await this.mapCustom.faInitMap();
+            const { map, map_objects, search_control } = await this.mapCustom.faInitMap();
 
             this.map = map;
             this.objectManager = map_objects;
             this.searchManager = search_control
-            this.zoomManager = zoom_control
 
             if(!this.markers || this.isMarkerOnClick){
                 this.map.events.add('click', this.onClickMap);
