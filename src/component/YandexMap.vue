@@ -49,17 +49,17 @@ export default {
         currentCoords: [],
         pathToBaloon: '',
     },
+    searchManager: null,
+    objectManager: null,
+    map: null,
+    searchControl: null,
 
     data() {
         return {
             mapCustom: null,
-            map: null,
             coords: [],
-            objectManager: null,
             point: null,
             oneMarker: null,
-            searchControl: null,
-            searchManager: null,
             mapId: `yandex-map-${Math.round(Math.random() * 1000)}`
         };
     },
@@ -102,10 +102,9 @@ export default {
             });
 
             const { map, map_objects, search_control } = await this.mapCustom.faInitMap();
-
-            this.map = map;
-            this.objectManager = map_objects;
             this.searchManager = search_control
+            this.objectManager = map_objects;
+            this.map = map;
 
             if(!this.markers || this.isMarkerOnClick){
                 this.map.events.add('click', this.onClickMap);
